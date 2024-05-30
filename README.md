@@ -5,7 +5,7 @@ Currently compatible with ZED SDK **4.1.2**
 
 Allows you to use Stereolabs sensors such as ZED 2, ZED 2i, ZED X, ZED Mini, ZED X Mini from Java.
 ## Usage
-zed-java-api requires ZED SDK to be installed on the system. Download ZED SDK for your system from [here](https://www.stereolabs.com/developers/release).
+zed-java-api requires ZED SDK to be installed on the system. Download ZED SDK for your system from [here](https://www.stereolabs.com/developers/release). You do not need to install zed-c-api, just ZED SDK.
 
 Supported platforms:
 - Linux (Ubuntu 20.04+ or similar x86_64)
