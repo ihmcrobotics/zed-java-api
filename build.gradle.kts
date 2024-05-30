@@ -38,6 +38,8 @@ publishing {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    // Transitive dependencies
     api("org.bytedeco:javacpp:1.5.10") {
         isTransitive = true
     }
@@ -47,6 +49,9 @@ dependencies {
     api("us.ihmc:ihmc-native-library-loader:2.0.2") {
         isTransitive = true
     }
+
+    // JavaCV/OpenCV for demos
+    testImplementation("org.bytedeco:javacv-platform:1.5.10")
 }
 
 tasks.test {
