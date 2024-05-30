@@ -35,3 +35,9 @@ You must manually load the library first before using it.
 ZEDJavaAPINativeLibrary.load();
 ```
 Ensure [this test](https://github.com/ihmcrobotics/zed-java-api/blob/main/src/test/java/us/ihmc/zed/test/TestNativeLibraryLoads.java) runs on your machine before proceeding.
+
+### OpenCV Demo
+A basic demo to display the images read from the camera is located in [DemoImageCaptureOpenCV.java](https://github.com/ihmcrobotics/zed-java-api/blob/main/src/test/java/us/ihmc/zed/test/DemoImageCaptureOpenCV.java).
+<p align="center">
+  <img src="https://github.com/ihmcrobotics/zed-java-api/assets/30220598/a040c614-f7ed-4475-bd86-5b1feee497f0" width="600px">
+</p>
