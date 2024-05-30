@@ -13,7 +13,6 @@ tar -xvf zed-c-api.tar.gz
 
 cp ../patches/CMakeLists.txt.zed_c_api.patch zed-c-api-$ZED_C_API_VERSION/CMakeLists.txt.zed_c_api.patch
 
-find ./zed-c-api-$ZED_C_API_VERSION -type f -print0 | xargs -0 dos2unix
 cd zed-c-api-$ZED_C_API_VERSION
 
 patch CMakeLists.txt CMakeLists.txt.zed_c_api.patch
@@ -21,19 +20,8 @@ patch CMakeLists.txt CMakeLists.txt.zed_c_api.patch
 mkdir build
 cd build
 
-if [ "$MAC_CROSS_COMPILE_ARM" == "1" ]; then
-  cmake -DCMAKE_OSX_ARCHITECTURES="arm64" ..
-elif [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
-  cmake -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-        -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
-        -DCMAKE_FIND_ROOT_PATH=/usr/aarch64-linux-gnu \
-        -DCMAKE_PROGRAM_PATH=/usr/aarch64-linux-gnu/bin \
-        ..
-else
-  cmake ..
-fi
-cmake --build . --config Release
-cmake --build . --target install
+cmake ..
+cmake --build . --config Release --target install
 
 popd
 ### Java generation ####
@@ -57,29 +45,22 @@ cp us/ihmc/zed/*.java ../src/main/java/us/ihmc/zed
 cp us/ihmc/zed/global/*.java ../src/main/java/us/ihmc/zed/global/
 
 #### JNI compilation ####
-if [ "$MAC_CROSS_COMPILE_ARM" == "1" ]; then
-  java -jar javacpp.jar -properties macosx-arm64 us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
-elif [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
-  java -jar javacpp.jar -properties linux-arm64 -Dplatform.compiler=aarch64-linux-gnu-g++ us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
-else
-  java -jar javacpp.jar us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
-fi
+java -jar javacpp.jar us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
 
 ##### Copy shared libs to resources ####
 # Linux
 mkdir -p ../src/main/resources/zed-java-api/native/linux-x86_64
-mkdir -p ../src/main/resources/zed-java-api/native/linux-arm64
 if [ -f "javainstall/libjnized.so" ]; then
-  if [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
-    cp javainstall/libjnized.so ../src/main/resources/zed-java-api/native/linux-arm64
-  else
-    cp javainstall/libjnized.so ../src/main/resources/zed-java-api/native/linux-x86_64
-  fi
+  cp javainstall/libjnized.so ../src/main/resources/zed-java-api/native/linux-x86_64
 fi
 if [ -f "lib/libsl_zed_c.so" ]; then
-  if [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
-    cp lib/libsl_zed_c.so ../src/main/resources/zed-java-api/native/linux-arm64
-  else
-    cp lib/libsl_zed_c.so ../src/main/resources/zed-java-api/native/linux-x86_64
-  fi
+  cp lib/libsl_zed_c.so ../src/main/resources/zed-java-api/native/linux-x86_64
+fi
+# Windows
+mkdir -p ../src/main/resources/zed-java-api/native/windows-x86_64
+if [ -f "javainstall/jnized.dll" ]; then
+  cp javainstall/jnized.dll ../src/main/resources/zed-java-api/native/windows-x86_64
+fi
+if [ -f "bin/sl_zed_c.dll" ]; then
+  cp bin/sl_zed_c.dll ../src/main/resources/zed-java-api/native/windows-x86_64
 fi

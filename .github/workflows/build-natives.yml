@@ -8,7 +8,7 @@ jobs:
     runs-on: [ubuntu-20.04]
     strategy:
       matrix:
-        platform: [x86_64, arm64]
+        platform: [x86_64]
       max-parallel: 1
     steps:
       - uses: actions/checkout@v4
@@ -16,16 +16,22 @@ jobs:
         run: |
           git reset --hard
           git pull
+      - uses: Jimver/cuda-toolkit@v0.2.15
+        id: cuda-toolkit
+        with:
+          cuda: '11.8.0'
+          method: 'network'
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install build-essential g++ gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu g++-aarch64-linux-gnu cmake git -y
+          sudo apt install build-essential g++ cmake git libusb-dev -y
           # Install ZED SDK
           pushd /tmp
-          curl -O https://stereolabs.sfo2.cdn.digitaloceanspaces.com/zedsdk/4.1/ZED_SDK_Ubuntu20_cuda12.1_v4.1.2.zstd.run
-          ./ZED_SDK_Ubuntu22_cuda12.1_v4.1.2.zstd.run -- silent skip_od_module skip_cuda skip_python
+          curl -O https://stereolabs.sfo2.cdn.digitaloceanspaces.com/zedsdk/4.1/ZED_SDK_Ubuntu20_cuda11.8_v4.1.2.zstd.run
+          chmod +x ZED_SDK_Ubuntu20_cuda11.8_v4.1.2.zstd.run
+          ./ZED_SDK_Ubuntu20_cuda11.8_v4.1.2.zstd.run -- silent skip_od_module skip_python skip_cuda
+          rm -rf ZED_SDK_Ubuntu20_cuda11.8_v4.1.2.zstd.run
           popd
-          ls -al /usr/local/zed
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -34,10 +40,6 @@ jobs:
         run: |
           java --version
           gradle --version
-      - name: Compile native library (arm64)
-        if: matrix.platform == 'arm64'
-        run: |
-          LINUX_CROSS_COMPILE_ARM=1 bash cppbuild.bash
       - name: Compile native library (x86_64)
         if: matrix.platform == 'x86_64'
         run: |
@@ -50,34 +52,44 @@ jobs:
           author_email: rosie@ihmc.us
           message: 'Rebuild natives for Linux'
           push: true
-#  build-windows:
-#    runs-on: [windows-2019]
-#    needs: [build-linux]
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: Pull repo
-#        run: |
-#          git reset --hard
-#          git pull
-#      - uses: ilammy/msvc-dev-cmd@v1
-#        with:
-#          vsversion: 2019
-#      - uses: actions/setup-java@v4
-#        with:
-#          distribution: 'temurin'
-#          java-version: '17'
-#      - name: Check Java/Gradle versions
-#        run: |
-#          java --version
-#          gradle --version
-#      - name: Compile native library
-#        run: |
-#          bash.exe cppbuild.bash
-#      - name: Commit native libraries
-#        uses: EndBug/add-and-commit@v9
-#        with:
-#          add: '*.dll' # Only commit generated java from Linux
-#          author_name: ihmc-rosie
-#          author_email: rosie@ihmc.us
-#          message: 'Rebuild natives for Windows'
-#          push: true
+  build-windows:
+    runs-on: [windows-2019]
+    needs: [build-linux]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull repo
+        run: |
+          git reset --hard
+          git pull
+      - uses: Jimver/cuda-toolkit@v0.2.15
+        id: cuda-toolkit
+        with:
+          cuda: '11.8.0'
+          method: 'network'
+      - name: Install dependencies
+        run: |
+          python -m pip install gdown
+          gdown https://drive.google.com/uc?id=1IqFk0z_msNmgK-vmAdvOJq2D0p7m8jDd
+          tar -xvf ZEDSDK-Windows-4.1.2.tar.gz -C "C:\\Program Files (x86)"
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: 2019
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Check Java/Gradle versions
+        run: |
+          java --version
+          gradle --version
+      - name: Compile native library
+        run: |
+          bash.exe cppbuild.bash
+      - name: Commit native libraries
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: '*.dll' # Only commit generated java from Linux
+          author_name: ihmc-rosie
+          author_email: rosie@ihmc.us
+          message: 'Rebuild natives for Windows'
+          push: true
