@@ -19,7 +19,7 @@ import org.bytedeco.javacpp.tools.InfoMapper;
         ),
         @Platform(
                 value = "windows",
-                includepath = {"include", "C:\\\\Program Files\\\\NVIDIA GPU Computing Toolkit\\\\CUDA\\\\v12.1\\\\include"}
+                includepath = {"include", "C:\\\\Program Files\\\\NVIDIA GPU Computing Toolkit\\\\CUDA\\\\v11.8\\\\include"}
         )
 },
         target = "us.ihmc.zed",
