@@ -28,10 +28,10 @@ import org.bytedeco.javacpp.tools.InfoMapper;
 public class ZEDJavaAPIConfig implements InfoMapper {
     @Override
     public void map(InfoMap infoMap) {
-        // TODO: Fix CUDA
-//      infoMap.put(new Info("CUcontext").pointerTypes("org.bytedeco.cuda.cudart.CUctx_st"));
-//      infoMap.put(new Info("cudaStream_t").pointerTypes("org.bytedeco.cuda.cudart.CUstream_st"));
-        infoMap.put(new Info("CUcontext").skip());
-        infoMap.put(new Info("cudaStream_t").skip());
+        infoMap.put(new Info().javaText("import org.bytedeco.cuda.cudart.CUctx_st;"))
+               .put(new Info().javaText("import org.bytedeco.cuda.cudart.CUstream_st;"))
+               .put(new Info("CUcontext").valueTypes("CUctx_st").pointerTypes("@ByPtrPtr CUctx_st"))
+               .put(new Info("CUstream").valueTypes("CUstream_st").pointerTypes("@ByPtrPtr CUstream_st"))
+               .put(new Info("cudaStream_t").valueTypes("CUstream_st").pointerTypes("@ByPtrPtr CUstream_st"));
     }
 }

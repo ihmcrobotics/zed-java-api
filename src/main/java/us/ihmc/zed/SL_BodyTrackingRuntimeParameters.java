@@ -2,6 +2,8 @@
 
 package us.ihmc.zed;
 
+import org.bytedeco.cuda.cudart.CUctx_st;
+import org.bytedeco.cuda.cudart.CUstream_st;
 import java.nio.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.annotation.*;

@@ -34,18 +34,16 @@ if [ ! -f javacpp.jar ]; then
   curl -L https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VERSION/javacpp-platform-$JAVACPP_VERSION-bin.zip -o javacpp-platform-$JAVACPP_VERSION-bin.zip
   unzip -j javacpp-platform-$JAVACPP_VERSION-bin.zip
 fi
-# TODO: Fix CUDA
-#if [ ! -f cuda-$JAVACPP_CUDA_VERSION.jar ]; then
-#    curl -O https://repo.maven.apache.org/maven2/org/bytedeco/cuda/$JAVACPP_CUDA_VERSION/cuda-$JAVACPP_CUDA_VERSION.jar
-#    unzip cuda-$JAVACPP_CUDA_VERSION.jar
-#fi
+if [ ! -f cuda-$JAVACPP_CUDA_VERSION.jar ]; then
+    curl -O https://repo.maven.apache.org/maven2/org/bytedeco/cuda/$JAVACPP_CUDA_VERSION/cuda-$JAVACPP_CUDA_VERSION.jar
+fi
 
-java -jar javacpp.jar us/ihmc/zed/ZEDJavaAPIConfig.java
+java -cp "javacpp.jar:cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco.javacpp.tools.Builder us/ihmc/zed/ZEDJavaAPIConfig.java
 cp us/ihmc/zed/*.java ../src/main/java/us/ihmc/zed
 cp us/ihmc/zed/global/*.java ../src/main/java/us/ihmc/zed/global/
 
 #### JNI compilation ####
-java -jar javacpp.jar us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
+java -cp "javacpp.jar:cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco.javacpp.tools.Builder us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
 
 ##### Copy shared libs to resources ####
 # Linux

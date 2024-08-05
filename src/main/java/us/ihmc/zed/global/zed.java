@@ -4,6 +4,8 @@ package us.ihmc.zed.global;
 
 import us.ihmc.zed.*;
 
+import org.bytedeco.cuda.cudart.CUctx_st;
+import org.bytedeco.cuda.cudart.CUstream_st;
 import java.nio.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.annotation.*;
@@ -1588,6 +1590,7 @@ public static final int
     This can be useful for sharing GPU memories.
     @param camera_id : Id of the camera instance.
     */
+    public static native CUctx_st sl_get_cuda_context(int camera_id);
 
     /**
     \brief Returns the SL_InitParameters used.
@@ -2694,6 +2697,7 @@ public static final int
     @param stream : a cuda stream to put the compute to (def. 0)
     \note If the Output Mat does not satisfies the requirements, it is freed and re-allocated.
     */
+    public static native int sl_convert_image(Pointer image_in_ptr, Pointer image_signed_ptr, CUstream_st stream);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////// Streaming Sender //////////////////////////////////////////////////////////////////////
