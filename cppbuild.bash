@@ -38,12 +38,23 @@ if [ ! -f cuda-$JAVACPP_CUDA_VERSION.jar ]; then
     curl -O https://repo.maven.apache.org/maven2/org/bytedeco/cuda/$JAVACPP_CUDA_VERSION/cuda-$JAVACPP_CUDA_VERSION.jar
 fi
 
-java -cp "javacpp.jar:cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco.javacpp.tools.Builder us/ihmc/zed/ZEDJavaAPIConfig.java
+CP_SEPARATOR=":"
+UNAME=$( command -v uname)
+case $( "${UNAME}" | tr '[:upper:]' '[:lower:]') in
+  msys*|cygwin*|mingw*|nt|win*)
+    CP_SEPARATOR=";"
+    ;;
+  *)
+    CP_SEPARATOR=":"
+    ;;
+esac
+
+java -cp "javacpp.jar"$CP_SEPARATOR"cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco.javacpp.tools.Builder us/ihmc/zed/ZEDJavaAPIConfig.java
 cp us/ihmc/zed/*.java ../src/main/java/us/ihmc/zed
 cp us/ihmc/zed/global/*.java ../src/main/java/us/ihmc/zed/global/
 
 #### JNI compilation ####
-java -cp "javacpp.jar:cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco.javacpp.tools.Builder us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
+java -cp "javacpp.jar"$CP_SEPARATOR"cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco.javacpp.tools.Builder us/ihmc/zed/*.java us/ihmc/zed/global/*.java -d javainstall
 
 ##### Copy shared libs to resources ####
 # Linux
