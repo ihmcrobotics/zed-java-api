@@ -19,6 +19,7 @@ import org.bytedeco.javacpp.tools.InfoMapper;
         ),
         @Platform(
                 value = "windows",
+                // This CUDA includepath is where CUDA would be installed within a Windows GitHub runner that compiles the native binaries
                 includepath = {"include", "C:\\\\Program Files\\\\NVIDIA GPU Computing Toolkit\\\\CUDA\\\\v11.8\\\\include"}
         )
 },

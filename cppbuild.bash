@@ -20,7 +20,16 @@ patch CMakeLists.txt CMakeLists.txt.zed_c_api.patch
 mkdir build
 cd build
 
-cmake ..
+if [ "$(uname)" == "Linux" ]; then
+  if [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
+    # For some reason, it's stubs_ on older versions of L4T
+    cmake -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs_ ..
+  else
+    cmake -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs ..
+  fi
+else # Windows
+  cmake ..
+fi
 cmake --build . --config Release --target install
 
 popd
@@ -59,11 +68,20 @@ java -cp "javacpp.jar"$CP_SEPARATOR"cuda-$JAVACPP_CUDA_VERSION.jar" org.bytedeco
 ##### Copy shared libs to resources ####
 # Linux
 mkdir -p ../src/main/resources/zed-java-api/native/linux-x86_64
+mkdir -p ../src/main/resources/zed-java-api/native/linux-arm64
 if [ -f "javainstall/libjnized.so" ]; then
-  cp javainstall/libjnized.so ../src/main/resources/zed-java-api/native/linux-x86_64
+  if [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
+    cp javainstall/libjnized.so ../src/main/resources/zed-java-api/native/linux-arm64
+  else
+    cp javainstall/libjnized.so ../src/main/resources/zed-java-api/native/linux-x86_64
+  fi
 fi
 if [ -f "lib/libsl_zed_c.so" ]; then
-  cp lib/libsl_zed_c.so ../src/main/resources/zed-java-api/native/linux-x86_64
+  if [ "$LINUX_CROSS_COMPILE_ARM" == "1" ]; then
+    cp lib/libsl_zed_c.so ../src/main/resources/zed-java-api/native/linux-arm64
+  else
+    cp lib/libsl_zed_c.so ../src/main/resources/zed-java-api/native/linux-x86_64
+  fi
 fi
 # Windows
 mkdir -p ../src/main/resources/zed-java-api/native/windows-x86_64
