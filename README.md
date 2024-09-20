@@ -9,7 +9,7 @@ zed-java-api requires ZED SDK to be installed on the system. Download ZED SDK fo
 
 Supported platforms:
 - Linux (Ubuntu 20.04+ or similar x86_64)
-- SOON: Linux, NVIDIA Jetson (arm64)
+- Linux, NVIDIA Jetson (L4T R35.3+ arm64)
 - Windows (Windows 10+ x86_64)
 
 Requires Java 17.
