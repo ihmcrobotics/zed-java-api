@@ -15,7 +15,10 @@ public class ZEDJavaAPINativeLibrary implements NativeLibraryDescription {
                 case LINUX64 -> "linux-x86_64";
             };
         } else if (arch == Architecture.arm64) {
-            throw new RuntimeException("Unsupported platform"); // TODO:
+            archPackage = switch (os) {
+                case WIN64, MACOSX64 -> throw new RuntimeException("Unsupported platform");
+                case LINUX64 -> "linux-arm64";
+            };
         }
 
         return "zed-java-api.native." + archPackage;
