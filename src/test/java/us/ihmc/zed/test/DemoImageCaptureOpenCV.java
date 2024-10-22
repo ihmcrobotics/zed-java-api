@@ -65,7 +65,7 @@ public class DemoImageCaptureOpenCV {
         init_param.open_timeout_sec(5.0f);
         init_param.async_grab_camera_recovery(false);
         init_param.grab_compute_capping_fps(0);
-        init_param.enable_image_validity_check(false);
+        init_param.enable_image_validity_check(0);
 
         // Open the camera
         int state = sl_open_camera(camera_id, init_param, 0, "", "", 0, "", "", "");
