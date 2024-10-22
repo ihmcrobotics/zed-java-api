@@ -12,7 +12,7 @@ jobs:
   build-linux-x86_64:
     runs-on: [self-hosted, ihmc-runner-nvidia]
     container:
-      image: stereolabs/zed:4.1-devel-cuda12.1-ubuntu20.04
+      image: stereolabs/zed:4.2-devel-cuda12.1-ubuntu20.04
     steps:
       - name: Install dependencies
         run: |
@@ -37,7 +37,7 @@ jobs:
   build-linux-l4t:
     runs-on: [self-hosted, ihmc-runner-nvidia]
     container:
-      image: stereolabs/zed:4.1-devel-l4t-r35.3
+      image: stereolabs/zed:4.2-devel-l4t-r35.3
     needs: [build-linux-x86_64]
     steps:
       - name: Install dependencies
@@ -100,8 +100,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install gdown
-          gdown https://drive.google.com/uc?id=1m_FVVQPPe2D7HCYL4htLuAcZRN64H1OB
-          tar -xvf ZEDSDK-Windows-4.1.3.tar.gz -C "C:\\Program Files (x86)"
+          gdown https://drive.google.com/uc?id=1uDEVu8hOGVJdnO_GEVWJu25QJmdcuxn-
+          tar -xvf ZEDSDK-Windows-4.2.1.tar.gz -C "C:\\Program Files (x86)"
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           vsversion: 2019

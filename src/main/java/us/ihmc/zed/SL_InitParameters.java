@@ -282,5 +282,5 @@ public class SL_InitParameters extends Pointer {
 	 This version doesn't detect frame tearing currently.
 	 \n default: disabled
 	 */
-	public native @Cast("bool") boolean enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(boolean setter);
+	public native int enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(int setter);
 }

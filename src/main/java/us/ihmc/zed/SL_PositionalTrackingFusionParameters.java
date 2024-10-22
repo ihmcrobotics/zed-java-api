@@ -39,9 +39,35 @@ public class SL_PositionalTrackingFusionParameters extends Pointer {
 	 * Default: false
 	 */
 	public native @Cast("bool") boolean enable_GNSS_fusion(); public native SL_PositionalTrackingFusionParameters enable_GNSS_fusion(boolean setter);
+
 	/**
 	 * \brief Control the VIO / GNSS calibration process.
-	 * 
 	 */
 	public native @ByRef SL_GNSSCalibrationParameters gnss_calibration_parameters(); public native SL_PositionalTrackingFusionParameters gnss_calibration_parameters(SL_GNSSCalibrationParameters setter);
+
+	/**
+	 * \brief Position of the base footprint with respect to the user world.
+	 */
+	public native @ByRef SL_Vector3 base_footprint_to_world_translation(); public native SL_PositionalTrackingFusionParameters base_footprint_to_world_translation(SL_Vector3 setter);
+
+	/**
+	 * \brief Orientation of the base footprint with respect to the user world.
+	 */
+	public native @ByRef SL_Quaternion base_footprint_to_world_rotation(); public native SL_PositionalTrackingFusionParameters base_footprint_to_world_rotation(SL_Quaternion setter);
+
+	/**
+	 * \brief Position of the base footprint with respect to the baselink
+	 */
+	public native @ByRef SL_Vector3 base_footprint_to_baselink_translation(); public native SL_PositionalTrackingFusionParameters base_footprint_to_baselink_translation(SL_Vector3 setter);
+
+	/**
+	 * \brief Orientation of the base footprint with respect to the baselink
+	 */
+	public native @ByRef SL_Quaternion base_footprint_to_baselink_rotation(); public native SL_PositionalTrackingFusionParameters base_footprint_to_baselink_rotation(SL_Quaternion setter);
+
+	/**
+	 * \brief Whether to override 2 of the 3 rotations from \ref base_footprint_to_world_transform using the IMU gravity.
+	 */
+	public native @Cast("bool") boolean set_gravity_as_origin(); public native SL_PositionalTrackingFusionParameters set_gravity_as_origin(boolean setter);
+
 }

@@ -59,7 +59,7 @@ public class SL_GeoPose extends Pointer {
 	 */
 	public native @ByRef SL_LatLng latlng_coordinates(); public native SL_GeoPose latlng_coordinates(SL_LatLng setter);
 	/**
-	 * The heading.
+	 * The heading (orientation) of the pose in radians. It indicates the direction in which the object or observer is facing, with 0 degrees corresponding to North and increasing in a counter-clockwise direction.
 	 */
 	public native double heading(); public native SL_GeoPose heading(double setter);
 	/**
