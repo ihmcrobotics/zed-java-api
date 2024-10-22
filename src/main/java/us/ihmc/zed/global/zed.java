@@ -46,6 +46,9 @@ public static final int MAX_SUBMESH = 1000;
 // Targeting ../SL_Vector4.java
 
 
+// Targeting ../SL_Transform.java
+
+
 // Targeting ../SL_Uchar2.java
 
 
@@ -121,6 +124,11 @@ public static final int
  */
 /** enum SL_ERROR_CODE */
 public static final int
+
+	/** The operation could not proceed with the target configuration but did success with a fallback.*/
+	SL_ERROR_CODE_CONFIGURATION_FALLBACK = -4,
+	/** The input data does not contains the high frequency sensors data, this is usually because it requires newer SVO/Streaming. In order to work this modules needs inertial data present in it input.*/
+	SL_ERROR_CODE_SENSORS_DATA_REQUIRED = -3,
 	/** The image could be corrupted, Enabled with the parameter InitParameters::enable_image_validity_check.*/
 	SL_ERROR_CODE_CORRUPTED_FRAME = -2,
 	/** The camera is currently rebooting.*/
@@ -192,9 +200,7 @@ public static final int
 	/** The module needs the sensors to be enabled (see SL_InitParameters.sensors_required). */
 	SL_ERROR_CODE_MOTION_SENSORS_REQUIRED = 32,
 	/** The module needs a newer version of CUDA. */
-	SL_ERROR_CODE_MODULE_NOT_COMPATIBLE_WITH_CUDA_VERSION = 33,
-	/** The input data does not contains the high frequency sensors data, this is usually because it requires newer SVO/Streaming. In order to work this modules needs inertial data present in it input.*/
-	SL_ERROR_CODE_SENSORS_DATA_REQUIRED = 34;
+	SL_ERROR_CODE_MODULE_NOT_COMPATIBLE_WITH_CUDA_VERSION = 33;
 
 /**
 \brief Lists available resolutions.
@@ -206,20 +212,22 @@ public static final int
 public static final int
 	/** 3856x2180 for imx678 mono*/
 	SL_RESOLUTION_HD4K = 0,
+	/** 3800x1800 */
+	SL_RESOLUTION_QHDPLUS = 1,
 	/** 2208*1242 (x2) \n Available FPS: 15*/
-	SL_RESOLUTION_HD2K = 1,
+	SL_RESOLUTION_HD2K = 2,
 	/** 1920*1080 (x2) \n Available FPS: 15, 30*/
-	SL_RESOLUTION_HD1080 = 2,
+	SL_RESOLUTION_HD1080 = 3,
 	/** 1920*1200 (x2) \n Available FPS: 15, 30, 60*/
-	SL_RESOLUTION_HD1200 = 3,
+	SL_RESOLUTION_HD1200 = 4,
 	/** 1280*720 (x2) \n Available FPS: 15, 30, 60*/
-	SL_RESOLUTION_HD720 = 4,
+	SL_RESOLUTION_HD720 = 5,
 	/** 960*600 (x2) \n Available FPS: 15, 30, 60, 120*/
-	SL_RESOLUTION_SVGA = 5,
+	SL_RESOLUTION_SVGA = 6,
 	/** 672*376 (x2) \n Available FPS: 15, 30, 60, 100*/
-	SL_RESOLUTION_VGA = 6,
+	SL_RESOLUTION_VGA = 7,
 	/** Select the resolution compatible with the camera: <ul><li>ZED X/X Mini: \ref SL_RESOLUTION_HD1200</li><li>other cameras: \ref SL_RESOLUTION_HD720</li></ul>*/
-	SL_RESOLUTION_AUTO = 7;
+	SL_RESOLUTION_AUTO = 8;
 
 /**
 \brief Lists available units for measures.
@@ -856,7 +864,10 @@ public static final int
 	/** Bounding box detector specialized in person heads, particularly well suited for crowded environments. The person localization is also improved, more accurate but slower than the base model.*/
 	SL_OBJECT_DETECTION_MODEL_PERSON_HEAD_BOX_ACCURATE = 4,
 	/** For external inference, using your own custom model and/or frameworks. This mode disables the internal inference engine, the 2D bounding box detection must be provided. */
-	SL_OBJECT_DETECTION_MODEL_CUSTOM_BOX_OBJECTS = 5;
+	SL_OBJECT_DETECTION_MODEL_CUSTOM_BOX_OBJECTS = 5,
+	/** For internal inference using your own custom YOLO-like model. This mode requires a onnx file to be passed in the ObjectDetectionParameters. This model will be used for inference. */
+	SL_OBJECT_DETECTION_MODEL_CUSTOM_YOLOLIKE_BOX_OBJECTS = 6;
+
 /**
 \brief Lists available models for the body tracking module.
 */
@@ -918,6 +929,15 @@ public static final int
 	SL_OBJECT_FILTERING_MODE_NMS_3D = 1,
 	/** The ZED SDK will remove objects that are in the same 3D position as an already tracked object of the same class id. */
 	SL_OBJECT_FILTERING_MODE_NMS_3D_PER_CLASS = 2;
+
+/**
+  * \brief Report the actual inference precision used
+  */
+/** enum SL_INFERENCE_PRECISION */
+public static final int
+	SL_INFERENCE_PRECISION_FP32 = 0,
+	SL_INFERENCE_PRECISION_FP16 = 1,
+	SL_INFERENCE_PRECISION_INT8 = 2;
 
 
 /**
@@ -1288,6 +1308,12 @@ public static final int
 // Targeting ../SL_ObjectDetectionRuntimeParameters.java
 
 
+// Targeting ../SL_CustomObjectDetectionProperties.java
+
+
+// Targeting ../SL_CustomObjectDetectionRuntimeParameters.java
+
+
 // Targeting ../SL_BodyTrackingParameters.java
 
 
@@ -1298,6 +1324,9 @@ public static final int
 
 
 // Targeting ../SL_CustomBoxObjectData.java
+
+
+// Targeting ../SL_CustomMaskObjectData.java
 
 
 // Targeting ../SL_Objects.java
@@ -1436,6 +1465,9 @@ public static final int
 
 
 // Targeting ../SL_FusionConfiguration.java
+
+
+// Targeting ../SL_SynchronizationParameter.java
 
 
 // Targeting ../SL_InitFusionParameters.java
@@ -2901,12 +2933,24 @@ public static final int
     /**
     \brief Feed the 3D Object tracking function with your own 2D bounding boxes from your own detection algorithm.
     @param camera_id : Id of the camera instance.
-    @param objects_in : 2D detections from custom detection algorithm.
     @param nb_objects : Number of custom objects (size of the object_in array).
+    @param objects_in : 2D detections from custom detection algorithm.
+    @param instance_id : Id of the Object detection instance. Used when multiple instances of the BT module are enabled at the same time.
     \note The detection should be done on the current grabbed left image as the internal process will use all current available data to extract 3D informations and perform object tracking.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if everything went fine, \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" otherwise.
    */
-    public static native int sl_ingest_custom_box_objects(int camera_id, int nb_objects, SL_CustomBoxObjectData objects_in);
+    public static native int sl_ingest_custom_box_objects(int camera_id, int nb_objects, SL_CustomBoxObjectData objects_in, @Cast("unsigned int") int instance_id);
+
+    /**
+    \brief Feed the 3D Object tracking function with your own 2D bounding boxes with masks from your own detection algorithm.
+    @param camera_id : Id of the camera instance.
+    @param nb_objects : Number of custom objects (size of the object_in array).
+    @param objects_in : 2D detections from custom detection algorithm.
+    @param instance_id : Id of the Object detection instance. Used when multiple instances of the BT module are enabled at the same time.
+    \note The detection should be done on the current grabbed left image as the internal process will use all current available data to extract 3D informations and perform object tracking.
+    @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if everything went fine, \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" otherwise.
+   */
+    public static native int sl_ingest_custom_mask_objects(int camera_id, int nb_objects, SL_CustomMaskObjectData objects_in, @Cast("unsigned int") int instance_id);
 
     /**
     \brief Retrieve objects detected by the object detection module.
@@ -2919,15 +2963,24 @@ public static final int
     public static native int sl_retrieve_objects(int camera_id, SL_ObjectDetectionRuntimeParameters object_detection_runtime_parameters, SL_Objects objects, @Cast("unsigned int") int instance_id);
 
     /**
+    \brief Retrieve objects detected by the custom object detection module.
+    @param camera_id : Id of the camera instance.
+    @param object_detection_runtime_parameters : Custom object detection runtime settings, can be changed at each detection. In async mode, the parameters update is applied on the next iteration.
+    @param objects : The detected objects will be saved into this object. If the object already contains data from a previous detection, it will be updated, keeping a unique ID for the same person.
+    @param instance_id : Id of the object detection instance. Used when multiple instances of the object detection module are enabled at the same time.
+    @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if everything went fine, \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" otherwise.
+     */
+    public static native int sl_retrieve_custom_objects(int camera_id, SL_CustomObjectDetectionRuntimeParameters object_detection_runtime_parameters, SL_Objects objects, @Cast("unsigned int") int instance_id);
+
+    /**
     \brief Retrieve bodies detected by the body tracking module.
     @param camera_id : id of the camera instance.
-    @param bodies : The detected bodies will be saved into this object. If the object already contains data from a previous detection, it will be updated, keeping a unique ID for the same person.
     @param body_tracking_runtime_parameters : Body Tracking runtime settings, can be changed at each detection. In async mode, the parameters update is applied on the next iteration.
+    @param bodies : The detected bodies will be saved into this object. If the object already contains data from a previous detection, it will be updated, keeping a unique ID for the same person.
     @param instance_id : Id of the object detection instance. Used when multiple instances of the object detection module are enabled at the same time.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if everything went fine, \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" otherwise.
      */
     public static native int sl_retrieve_bodies(int camera_id, SL_BodyTrackingRuntimeParameters body_tracking_runtime_parameters, SL_Bodies bodies, @Cast("unsigned int") int instance_id);
-
 
     /**
     \brief Updates the internal batch of detected objects.
@@ -3056,9 +3109,29 @@ public static final int
     @return a vector of \ref SL_FusionConfiguration for all the camera present in the file.
     \note empty if no data were found for the requested camera.
      */
-    public static native void sl_fusion_read_configuration_file(@Cast("char*") BytePointer json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntPointer nb_cameras);
-    public static native void sl_fusion_read_configuration_file(@Cast("char*") ByteBuffer json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntBuffer nb_cameras);
-    public static native void sl_fusion_read_configuration_file(@Cast("char*") byte[] json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, int[] nb_cameras);
+    public static native void sl_fusion_read_configuration_file(@Cast("const char*") BytePointer json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntPointer nb_cameras);
+    public static native void sl_fusion_read_configuration_file(String json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntBuffer nb_cameras);
+    public static native void sl_fusion_read_configuration_file(@Cast("const char*") BytePointer json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, int[] nb_cameras);
+    public static native void sl_fusion_read_configuration_file(String json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntPointer nb_cameras);
+    public static native void sl_fusion_read_configuration_file(@Cast("const char*") BytePointer json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntBuffer nb_cameras);
+    public static native void sl_fusion_read_configuration_file(String json_config_filename, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, int[] nb_cameras);
+
+
+    /**
+    \brief Read a Configuration JSON string to configure a fusion process.
+    @param fusion_configuration : The string containing the configuration (it will be parsed like a json).
+    @param coord_sys : The COORDINATE_SYSTEM in which you want the World Pose to be in.
+    @param unit : The UNIT in which you want the World Pose to be in.
+    <p>
+    @return A vector of \ref FusionConfiguration for all the camera present in the file.
+    \note Empty if no data were found for the requested camera.
+     */
+    public static native void sl_fusion_read_configuration(@Cast("const char*") BytePointer fusion_configuration, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntPointer nb_cameras);
+    public static native void sl_fusion_read_configuration(String fusion_configuration, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntBuffer nb_cameras);
+    public static native void sl_fusion_read_configuration(@Cast("const char*") BytePointer fusion_configuration, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, int[] nb_cameras);
+    public static native void sl_fusion_read_configuration(String fusion_configuration, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntPointer nb_cameras);
+    public static native void sl_fusion_read_configuration(@Cast("const char*") BytePointer fusion_configuration, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, IntBuffer nb_cameras);
+    public static native void sl_fusion_read_configuration(String fusion_configuration, @Cast("SL_COORDINATE_SYSTEM") int coord_system, @Cast("SL_UNIT") int unit, SL_FusionConfiguration configs, int[] nb_cameras);
 
     /////////////////////////////////////////////////////////////////////
     ///////////////////// Object Detection Fusion ///////////////////////
@@ -3113,7 +3186,7 @@ public static final int
      * @param uuid Camera identifier
      * @return POSITIONAL_TRACKING_STATE is the current state of the tracking process
      */
-    public static native @Cast("SL_POSITIONAL_TRACKING_STATE") int sl_fusion_get_position(SL_PoseData pose, @Cast("SL_REFERENCE_FRAME") int reference_frame, @Cast("SL_UNIT") int unit,
+    public static native @Cast("SL_POSITIONAL_TRACKING_STATE") int sl_fusion_get_position(SL_PoseData pose, @Cast("SL_REFERENCE_FRAME") int reference_frame,
                                                                SL_CameraIdentifier uuid, @Cast("SL_POSITION_TYPE") int retrieve_type);
 
 

@@ -54,6 +54,15 @@ public class SL_Bodies extends Pointer {
 	 */
 	public native int is_tracked(); public native SL_Bodies is_tracked(int setter);
 	/**
+	\brief Status of the actual inference precision mode used to detect the bodies/persons.
+	\note It depends on the GPU hardware support, the sl::BodyTrackingParameters.allow_reduced_precision_inference input parameter and the model support.
+	 */
+	public native @Cast("SL_INFERENCE_PRECISION") int inference_precision_mode(); public native SL_Bodies inference_precision_mode(int setter);
+	/**
+	\brief Body format used in sl::BodyTrackingParameters.body_format parameter.
+	 */
+	public native @Cast("SL_BODY_FORMAT") int body_format(); public native SL_Bodies body_format(int setter);
+	/**
 	\brief Array of bodies/persons.
 	\note Since the data is transmitted from C++ to C, the size of the structure must be constant.
 	\note Therefore, there is a limitation of 75 objects in the image.

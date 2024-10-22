@@ -60,6 +60,43 @@ public class SL_ObjectDetectionParameters extends Pointer {
 	Default: \ref SL_OBJECT_DETECTION_MODEL_MULTI_CLASS_BOX_FAST
 	 */
 	public native @Cast("SL_OBJECT_DETECTION_MODEL") int detection_model(); public native SL_ObjectDetectionParameters detection_model(int setter);
+
+	/**
+	\brief In a multi camera setup, specify which group this model belongs to.
+	<p>
+	In a multi camera setup, multiple cameras can be used to detect objects and multiple detector having similar output layout can see the same object.
+	Therefore, Fusion will fuse together the outputs received by multiple detectors only if they are part of the same \ref fused_objects_group_name.
+	<p>
+	\note This parameter is not used when not using a multi-camera setup and must be set in a multi camera setup.
+	*/
+	public native @Cast("char*") BytePointer fused_objects_group_name(); public native SL_ObjectDetectionParameters fused_objects_group_name(BytePointer setter);
+
+	/**
+	\brief Path to the YOLO-like onnx file for custom object detection ran in the ZED SDK.
+	<p>
+	When {@code detection_model} is \ref OBJECT_DETECTION_MODEL::CUSTOM_YOLOLIKE_BOX_OBJECTS, a onnx model must be passed so that the ZED SDK can optimize it for your GPU and run inference on it.
+	<p>
+	The resulting optimized model will be saved for re-use in the future.
+	<p>
+	\attention - The model must be a YOLO-like model.
+	\attention - The caching uses the {@code custom_onnx_file} string along with your GPU specs to decide whether to use the cached optmized model or to optimize the passed onnx model.
+		If you want to use a different model (i.e. an onnx with different weights), you must use a different {@code custom_onnx_file} string or delete the cached optimized model in
+		<ZED Installation path>/resources.
+	<p>
+	\note This parameter is useless when detection_model is not \ref OBJECT_DETECTION_MODEL::CUSTOM_YOLOLIKE_BOX_OBJECTS.
+	*/
+	public native @Cast("char*") BytePointer custom_onnx_file(); public native SL_ObjectDetectionParameters custom_onnx_file(BytePointer setter);
+
+	/**
+	\brief Resolution to the YOLO-like onnx file for custom object detection ran in the ZED SDK. This resolution defines the input tensor size for dynamic shape ONNX model only. The batch and channel dimensions are automatically handled, it assumes it's color images like default YOLO models.
+	<p>
+	\note This parameter is only used when detection_model is \ref OBJECT_DETECTION_MODEL::CUSTOM_YOLOLIKE_BOX_OBJECTS and the provided ONNX file is using dynamic shapes.
+	\attention - Multiple model only support squared images
+		
+	\default Squared images 512x512 (input tensor will be 1x3x512x512)
+		*/
+	public native @ByRef SL_Resolution custom_onnx_dynamic_input_shape(); public native SL_ObjectDetectionParameters custom_onnx_dynamic_input_shape(SL_Resolution setter);
+
 	/**
 	\brief Upper depth range for detections.
 	

@@ -11,7 +11,6 @@ import org.bytedeco.javacpp.annotation.*;
 import static us.ihmc.zed.global.zed.*;
 
 
-
 /**
 \brief Holds the options used to initialize the \ref Fusion object.
  */
@@ -62,9 +61,15 @@ public class SL_InitFusionParameters extends Pointer {
 	public native @Cast("bool") boolean verbose(); public native SL_InitFusionParameters verbose(boolean setter);
 
 	/**
-	 * \brief If specified change the number of period necessary for a source to go in timeout without data. For example, if you set this to 5
-	 * then, if any source do not receive data during 5 period, these sources will go to timeout and will be ignored.
-	 * 
+	 * \brief If specified change the number of period necessary for a source to go in timeout without data. For example, if you set this to 5 then, if any source do not receive data during 5 period, these sources will go to timeout and will be ignored.
+	 * \note This parameter is deprecated. Use {@code data_source_timeout} present in {@code synchronization_parameters} instead.
 	 */
-	public native @Cast("unsigned int") int timeout_period_number(); public native SL_InitFusionParameters timeout_period_number(int setter);
+	public native @Cast("unsigned") int timeout_period_number(); public native SL_InitFusionParameters timeout_period_number(int setter);
+
+	/**
+	 * \brief Specifies the parameters used for data synchronization during fusion.
+	 *
+	 * The SynchronizationParameter struct encapsulates the synchronization parameters that control the data fusion process.
+	 */
+	public native @ByRef SL_SynchronizationParameter synchronization_parameters(); public native SL_InitFusionParameters synchronization_parameters(SL_SynchronizationParameter setter); 
 }
