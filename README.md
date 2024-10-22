@@ -1,7 +1,7 @@
 # zed-java-api
 zed-java-api provides Java JNI bindings for ZED SDK. The bindings are based on [zed-c-api](https://github.com/stereolabs/zed-c-api).
 
-Currently compatible with ZED SDK **4.1.x**.
+Currently compatible with ZED SDK **4.2.x**.
 
 Allows you to use Stereolabs sensors such as ZED 2, ZED 2i, ZED X, ZED Mini, ZED X Mini from Java.
 ## Usage
@@ -16,7 +16,7 @@ Requires Java 17.
 ### Gradle
 ```
 dependencies {
-  implementation("us.ihmc:zed-java-api:4.1.4")
+  implementation("us.ihmc:zed-java-api:4.2.0")
 }
 ```
 ### Maven
@@ -25,7 +25,7 @@ dependencies {
   <dependency>
     <groupId>us.ihmc</groupId>
     <artifactId>zed-java-api</artifactId>
-    <version>4.1.4</version>
+    <version>4.2.0</version>
   </dependency>
 </dependencies>
 ```
