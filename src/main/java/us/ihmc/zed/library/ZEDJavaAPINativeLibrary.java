@@ -66,8 +66,8 @@ public class ZEDJavaAPINativeLibrary implements NativeLibraryDescription {
             }
         }
 
-        if (installedZEDSDKMajorVersion >= ZED_SDK_COMPATIBILITY_MAJOR_VERSION
-                && installedZEDSDKMinorVersion >= ZED_SDK_COMPATIBILITY_MINOR_VERSION) {
+        if (installedZEDSDKMajorVersion > ZED_SDK_COMPATIBILITY_MAJOR_VERSION ||
+                (installedZEDSDKMajorVersion == ZED_SDK_COMPATIBILITY_MAJOR_VERSION && installedZEDSDKMinorVersion >= ZED_SDK_COMPATIBILITY_MINOR_VERSION)) {
             if (!loaded) {
                 ZEDJavaAPINativeLibrary lib = new ZEDJavaAPINativeLibrary();
                 loaded = NativeLibraryLoader.loadLibrary(lib);
