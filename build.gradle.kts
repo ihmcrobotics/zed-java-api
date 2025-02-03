@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "us.ihmc"
-version = "4.2.0_1"
+version = "4.2.0_2"
 
 repositories {
     mavenCentral()
@@ -36,22 +36,33 @@ publishing {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-
     // Transitive dependencies
-    api("org.bytedeco:javacpp:1.5.10") {
+    api("us.ihmc:javacpp:1.5.11-ihmc-2") {
         isTransitive = true
     }
-    api("org.bytedeco:cuda:12.3-8.9-1.5.10") {
+    api("us.ihmc:cuda:12.6-9.5-1.5.11-ihmc-2") {
         isTransitive = true
     }
     api("us.ihmc:ihmc-native-library-loader:2.0.2") {
         isTransitive = true
     }
 
-    // JavaCV/OpenCV for demos
-    testImplementation("org.bytedeco:javacv-platform:1.5.10")
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
+    // OpenCV for demos
+    val openblasVersion = "0.3.28-1.5.11-ihmc-2"
+    testImplementation("us.ihmc:openblas:$openblasVersion")
+    testImplementation("us.ihmc:openblas:$openblasVersion:linux-x86_64")
+    testImplementation("us.ihmc:openblas:$openblasVersion:linux-arm64")
+    testImplementation("us.ihmc:openblas:$openblasVersion:windows-x86_64")
+    val opencvVersion = "4.10.0-1.5.11-ihmc-2"
+    testImplementation("us.ihmc:opencv:$opencvVersion")
+    testImplementation("us.ihmc:opencv:$opencvVersion:linux-arm64")
+    testImplementation("us.ihmc:opencv:$opencvVersion:linux-x86_64")
+    testImplementation("us.ihmc:opencv:$opencvVersion:linux-x86_64-gpu")
+    testImplementation("us.ihmc:opencv:$opencvVersion:windows-x86_64")
+    testImplementation("us.ihmc:opencv:$opencvVersion:windows-x86_64-gpu")
 }
 
 tasks.test {
