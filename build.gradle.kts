@@ -43,7 +43,7 @@ dependencies {
     api("us.ihmc:cuda:12.6-9.5-1.5.11-ihmc-2") {
         isTransitive = true
     }
-    api("us.ihmc:ihmc-native-library-loader:2.0.2") {
+    api("us.ihmc:ihmc-native-library-loader:2.0.4") {
         isTransitive = true
     }
 
