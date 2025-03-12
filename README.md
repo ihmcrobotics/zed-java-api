@@ -34,7 +34,17 @@ You must manually load the library first before using it.
 ```
 ZEDJavaAPINativeLibrary.load();
 ```
-Ensure [this test](https://github.com/ihmcrobotics/zed-java-api/blob/main/src/test/java/us/ihmc/zed/test/TestNativeLibraryLoads.java) runs on your machine before proceeding.
+
+After the native JNI library is loaded, programming using zed-java-api is nearly identical to zed-c-api.
+
+### Tools
+
+#### ZEDTools.errorName(int zedErrorCode)
+Retrieve the error name associated with an error code
+#### ZEDTools.errorMessage(int zedErrorCode)
+Retrieve a formatted error message from an error code
+#### ZEDTools.throwOnError(int zedErrorCode)
+Throw a ZEDException if an error code is not SL_ERROR_CODE_SUCCESS
 
 ### OpenCV Demo
 A basic demo to display the images read from the camera is located in [DemoImageCaptureOpenCV.java](https://github.com/ihmcrobotics/zed-java-api/blob/main/src/test/java/us/ihmc/zed/test/DemoImageCaptureOpenCV.java).
