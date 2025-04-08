@@ -5,6 +5,7 @@ import us.ihmc.tools.nativelibraries.NativeLibraryLoader;
 import us.ihmc.tools.nativelibraries.NativeLibraryWithDependencies;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -82,26 +83,30 @@ public class ZEDJavaAPINativeLibrary implements NativeLibraryDescription {
     }
 
     public static String getZEDSDKCMakePackageVersion() {
-        String cmakePackageFile;
+        String cmakePackageFilePath;
 
         if (System.getProperty("os.name").contains("Windows")) {
-            cmakePackageFile = "C:/Program Files (x86)/ZED SDK/zed-config-version.cmake";
+            cmakePackageFilePath = "C:/Program Files (x86)/ZED SDK/zed-config-version.cmake";
         } else {
-            cmakePackageFile = "/usr/local/zed/zed-config-version.cmake";
+            cmakePackageFilePath = "/usr/local/zed/zed-config-version.cmake";
         }
 
-        try (BufferedReader br = new BufferedReader(new FileReader(cmakePackageFile))) {
-            String line;
-            Pattern pattern = Pattern.compile("set\\(PACKAGE_VERSION \"(\\d+\\.\\d+\\.\\d+)\"\\)");
+        File cmakePackageFile = new File(cmakePackageFilePath);
 
-            while ((line = br.readLine()) != null) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.find()) {
-                    return matcher.group(1).trim();
+        if (cmakePackageFile.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(cmakePackageFile))) {
+                String line;
+                Pattern pattern = Pattern.compile("set\\(PACKAGE_VERSION \"(\\d+\\.\\d+\\.\\d+)\"\\)");
+
+                while ((line = br.readLine()) != null) {
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.find()) {
+                        return matcher.group(1).trim();
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return null;
