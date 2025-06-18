@@ -35,7 +35,7 @@ public class SL_BarometerData extends Pointer {
 	/** \brief Whether the barometer sensor is available in your camera.*/
 	public native @Cast("bool") boolean is_available(); public native SL_BarometerData is_available(boolean setter);
 	/** \brief Data acquisition timestamp in nanoseconds.*/
-	public native @Cast("unsigned long long") long timestamp_ns(); public native SL_BarometerData timestamp_ns(long setter);
+	public native @Cast("uint64_t") long timestamp_ns(); public native SL_BarometerData timestamp_ns(long setter);
 	/** \brief Ambient air pressure in hectopascal (hPa).*/
 	public native float pressure(); public native SL_BarometerData pressure(float setter);
 	/** \brief Relative altitude from first camera position (at \ref sl_open_camera() time).*/

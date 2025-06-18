@@ -54,6 +54,10 @@ public class SL_DeviceProperties extends Pointer {
 	public native @Cast("unsigned char") byte path(int i); public native SL_DeviceProperties path(int i, byte setter);
 	@MemberGetter public native @Cast("unsigned char*") BytePointer path();
 	/**
+	\brief i2c port of the camera.
+	 */
+	public native int i2c_port(); public native SL_DeviceProperties i2c_port(int setter);
+	/**
 	\brief Model of the camera.
 	 */
 	public native @Cast("SL_MODEL") int camera_model(); public native SL_DeviceProperties camera_model(int setter);
@@ -67,7 +71,30 @@ public class SL_DeviceProperties extends Pointer {
 
 	public native @Cast("unsigned int") int sn(); public native SL_DeviceProperties sn(int setter);
 	/**
+	\brief [Cam model, eeprom version, white balance param]
+	 */
+	public native @Cast("unsigned char") byte identifier(int i); public native SL_DeviceProperties identifier(int i, byte setter);
+	@MemberGetter public native @Cast("unsigned char*") BytePointer identifier();
+	/**
+	\brief badge name (zedx_ar0234)
+	 */
+	public native @Cast("char*") BytePointer camera_badge(); public native SL_DeviceProperties camera_badge(BytePointer setter);
+
+	/**
+	\brief Name of sensor (zedx)
+	 */
+	public native @Cast("char*") BytePointer camera_sensor_model(); public native SL_DeviceProperties camera_sensor_model(BytePointer setter);
+	/**
+	\brief Name of Camera in DT (ZED_CAM1)
+	 */
+	public native @Cast("char*") BytePointer camera_name(); public native SL_DeviceProperties camera_name(BytePointer setter);
+	/**
 	\brief Input type of the camera.
 	 */
 	public native @Cast("SL_INPUT_TYPE") int input_type(); public native SL_DeviceProperties input_type(int setter);
+	/**
+	\brief sensor_address when available (ZED-X HDR/XOne HDR only)
+	 */
+	public native @Cast("unsigned char") byte sensor_address_left(); public native SL_DeviceProperties sensor_address_left(byte setter);
+	public native @Cast("unsigned char") byte sensor_address_right(); public native SL_DeviceProperties sensor_address_right(byte setter);
 }

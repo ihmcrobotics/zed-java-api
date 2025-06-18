@@ -44,9 +44,9 @@ public class SL_SensorParameters extends Pointer {
 	public native float sampling_rate(); public native SL_SensorParameters sampling_rate(float setter);
 	/** \brief Range of the sensor (minimum: {@code range.x}, maximum: {@code range.y}). */
 	public native @ByRef SL_Vector2 range(); public native SL_SensorParameters range(SL_Vector2 setter);
-	/** \brief White noise density given as continuous (frequency-independent).\note The units will be expressed in <pre>{@code sensor_unit / ???(Hz)}</pre>.\note {@code NAN} if the information is not available. */
+	/** \brief White noise density given as continuous (frequency-independent).\note The units will be expressed in <pre>{@code sensor_unit / √(Hz)}</pre>.\note {@code NAN} if the information is not available. */
 	public native float noise_density(); public native SL_SensorParameters noise_density(float setter);
-	/** \brief Random walk derived from the Allan Variance given as continuous (frequency-independent).\note The units will be expressed in <pre>{@code sensor_unit / ???(Hz)}</pre>.\note {@code NAN} if the information is not available. */
+	/** \brief Random walk derived from the Allan Variance given as continuous (frequency-independent).\note The units will be expressed in <pre>{@code sensor_unit / √(Hz)}</pre>.\note {@code NAN} if the information is not available. */
 	public native float random_walk(); public native SL_SensorParameters random_walk(float setter);
 	/** \brief Unit of the sensor. */
 	public native @Cast("SL_SENSORS_UNIT") int sensor_unit(); public native SL_SensorParameters sensor_unit(int setter);

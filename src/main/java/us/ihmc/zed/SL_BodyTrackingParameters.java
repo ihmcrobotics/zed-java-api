@@ -91,9 +91,6 @@ public class SL_BodyTrackingParameters extends Pointer {
 	\note The value cannot be greater than SL_InitParameters.depth_maximum_distance and its unit is defined in SL_InitParameters.coordinate_unit.
 	 */
 	public native float max_range(); public native SL_BodyTrackingParameters max_range(float setter);
-
-// #if 0
-// #endif
 	/**
 	\brief Prediction duration of the ZED SDK when an object is not detected anymore before switching its state to \ref SL_OBJECT_TRACKING_STATE_SEARCHING.
 	

@@ -56,4 +56,10 @@ public class SL_FusionConfiguration extends Pointer {
 	The input type for the current camera.
 	*/
 	public native @ByRef SL_InputType input_type(); public native SL_FusionConfiguration input_type(SL_InputType setter);
+	/**
+	 * \brief Indicates the behavior of the fusion with respect to given calibration pose.
+	 * If true : The calibration pose directly specifies the camera's absolute pose relative to a global reference frame.
+	 * If false : The calibration pose (Pose_rel) is defined relative to the camera's IMU rotational pose. To determine the true absolute position, the Fusion process will compute Pose_abs = Pose_rel * Rot_IMU_camera.
+	 */
+	public native @Cast("bool") boolean override_gravity(); public native SL_FusionConfiguration override_gravity(boolean setter);
 }

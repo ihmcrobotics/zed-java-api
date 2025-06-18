@@ -83,7 +83,6 @@ public class SL_CustomMaskObjectData extends Pointer {
 	/**
 	\brief Maximum tracking time threshold (in seconds) before dropping the tracked object when unseen for this amount of time.
 	By default, let the tracker decide internally based on the internal sub class of the tracked object.
-	Only valid for static object.
 		*/
 	public native float tracking_timeout(); public native SL_CustomMaskObjectData tracking_timeout(float setter);
 
@@ -96,6 +95,47 @@ public class SL_CustomMaskObjectData extends Pointer {
 	
 	/**
 	\brief 2D mask of the object inside its bounding box.
-	 */
+		*/
 	public native @Cast("unsigned char*") BytePointer box_mask(); public native SL_CustomMaskObjectData box_mask(BytePointer setter);
+
+	/**
+	\brief Maximum allowed 3D width.
+	<p>
+	Any prediction bigger than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float max_box_width_meters(); public native SL_CustomMaskObjectData max_box_width_meters(float setter);
+
+	/**
+	\brief Minimum allowed 3D width.
+	<p>
+	Any prediction smaller than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float min_box_width_meters(); public native SL_CustomMaskObjectData min_box_width_meters(float setter);
+
+	/**
+	\brief Maximum allowed 3D height.
+	<p>
+	Any prediction bigger than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float max_box_height_meters(); public native SL_CustomMaskObjectData max_box_height_meters(float setter);
+
+	/**
+	\brief Minimum allowed 3D height.
+	<p>
+	Any prediction smaller than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float min_box_height_meters(); public native SL_CustomMaskObjectData min_box_height_meters(float setter);
+
+	/**
+	\brief Manually override the acceleration preset.
+	If set, this value takes precedence over the selected preset, allowing for a custom maximum acceleration.
+	Takes precedence over the runtime parameter, if also set.
+	Unit is m/s^2.
+	Defaults: NaN
+		*/
+	public native float max_allowed_acceleration(); public native SL_CustomMaskObjectData max_allowed_acceleration(float setter);
 }

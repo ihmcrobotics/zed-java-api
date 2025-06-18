@@ -95,4 +95,22 @@ public class SL_SpatialMappingParameters extends Pointer {
 	\n Default: 0 (this will define the stability counter based on the mesh resolution, the higher the resolution, the higher the stability counter)
 	*/
 	public native int stability_counter(); public native SL_SpatialMappingParameters stability_counter(int setter);
+	/**
+	\brief Control the disparity noise (standard deviation) in px. set a very small value (<0.1) if the depth map of the scene is accurate.
+	set a big value (>0.5) if the depth map is noisy.
+	 */
+	public native float disparity_std(); public native SL_SpatialMappingParameters disparity_std(float setter);
+
+	/**
+	\brief Adjust the weighting factor for the current depth during the integration process.
+	 By default, the value is set to 1, which results in the complete integration and fusion of the current depth with the previously integrated depth.
+	 Setting it to 0 discards all previous data and solely integrates the current depth.
+	 */
+	public native float decay(); public native SL_SpatialMappingParameters decay(float setter);
+
+	/**
+	 \brief This parameter enables the forgetting of the previous map to limit memory and drift issues. It enables a local spatial mapping that only keeps
+	 a mapped scene around the current camera position. The distance threshold is set to be equal to 1.5 x the range of the spatial mapping.
+	 */
+	public native @Cast("bool") boolean enable_forget_past(); public native SL_SpatialMappingParameters enable_forget_past(boolean setter);
 }

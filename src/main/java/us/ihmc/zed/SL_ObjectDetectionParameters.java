@@ -121,6 +121,7 @@ public class SL_ObjectDetectionParameters extends Pointer {
 	\note In this case, you might need to add your own NMS filter before ingesting the boxes into the object detection module.
 	*/
 	public native @Cast("SL_OBJECT_FILTERING_MODE") int filtering_mode(); public native SL_ObjectDetectionParameters filtering_mode(int setter);
+
 	/**
 	\brief Prediction duration of the ZED SDK when an object is not detected anymore before switching its state to \ref SL_OBJECT_TRACKING_STATE_SEARCHING.
 	

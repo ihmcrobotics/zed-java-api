@@ -63,7 +63,7 @@ public class SL_PositionalTrackingParameters extends Pointer {
     <p>
     Default: false
 	*/
-	public native @Cast("bool") boolean enable_pose_smothing(); public native SL_PositionalTrackingParameters enable_pose_smothing(boolean setter);
+	public native @Cast("bool") boolean enable_pose_smoothing(); public native SL_PositionalTrackingParameters enable_pose_smoothing(boolean setter);
 	/**
 	\brief Initializes the tracking to be aligned with the floor plane to better position the camera in space.
 	<p>
@@ -116,5 +116,4 @@ public class SL_PositionalTrackingParameters extends Pointer {
 	\n Default: \ref SL_POSITIONAL_TRACKING_MODE_GEN_1
 	*/
 	public native @Cast("SL_POSITIONAL_TRACKING_MODE") int mode(); public native SL_PositionalTrackingParameters mode(int setter);
-
 }

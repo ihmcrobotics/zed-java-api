@@ -44,7 +44,7 @@ public class SL_Bodies extends Pointer {
     <p>
     This value is especially useful for the async mode to synchronize the data.
 	 */
-	public native @Cast("unsigned long long") long timestamp(); public native SL_Bodies timestamp(long setter);
+	public native @Cast("uint64_t") long timestamp(); public native SL_Bodies timestamp(long setter);
 	/**
 	\brief Whether \ref body_list has already been retrieved or not.
 	 */

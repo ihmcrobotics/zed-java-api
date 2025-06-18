@@ -36,12 +36,11 @@ public class SL_SVOData extends Pointer {
 	/**
 	\brief Key used to retrieve the data stored into SVOData's content.
 	 */
-	public native @Cast("char") byte key(int i); public native SL_SVOData key(int i, byte setter);
-	@MemberGetter public native @Cast("char*") BytePointer key();
+	public native @Cast("char*") BytePointer key(); public native SL_SVOData key(BytePointer setter);
 	/**
-	\brief Timestamp of the data.
+	\brief Size of the key
 	 */
-	public native @Cast("unsigned long long") long timestamp_ns(); public native SL_SVOData timestamp_ns(long setter);
+	public native int key_size(); public native SL_SVOData key_size(int setter);
 	/**
 	\brief content stored as SVOData.
 	* Allow any type of content, including raw data like compressed images or JSON.
@@ -51,4 +50,8 @@ public class SL_SVOData extends Pointer {
 	\brief Size of the content.
 	 */
 	public native int content_size(); public native SL_SVOData content_size(int setter);
+	/**
+	\brief Timestamp of the data.
+	 */
+	public native @Cast("uint64_t") long timestamp_ns(); public native SL_SVOData timestamp_ns(long setter);
 }

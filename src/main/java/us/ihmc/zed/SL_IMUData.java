@@ -39,7 +39,7 @@ public class SL_IMUData extends Pointer {
 	/**
 	\brief Data acquisition timestamp in nanoseconds.
 	*/
-	public native @Cast("unsigned long long") long timestamp_ns(); public native SL_IMUData timestamp_ns(long setter);
+	public native @Cast("uint64_t") long timestamp_ns(); public native SL_IMUData timestamp_ns(long setter);
 	/**
 	\brief Gets the angular velocity vector of the gyroscope in deg/s.
 	<p>
@@ -49,7 +49,7 @@ public class SL_IMUData extends Pointer {
 	*/
 	public native @ByRef SL_Vector3 angular_velocity(); public native SL_IMUData angular_velocity(SL_Vector3 setter);
 	/**
-	\brief Linear acceleration vector (3x1) of the gyroscope in m/s??.
+	\brief Linear acceleration vector (3x1) of the gyroscope in m/s².
 	
 	The value is corrected from bias, scale and misalignment.
 	\note The value can be directly ingested in an IMU fusion algorithm to extract a quaternion.
@@ -63,7 +63,7 @@ public class SL_IMUData extends Pointer {
 	*/
 	public native @ByRef SL_Vector3 angular_velocity_unc(); public native SL_IMUData angular_velocity_unc(SL_Vector3 setter); //uncalibrated
 	/**
-	\brief Linear acceleration vector of the gyroscope in m/s?? (uncorrected from the IMU calibration).
+	\brief Linear acceleration vector of the gyroscope in m/s² (uncorrected from the IMU calibration).
 	\note The value is the exact raw values from the IMU.
 	\note Not available in SVO or STREAM mode.
 	*/
@@ -82,7 +82,7 @@ public class SL_IMUData extends Pointer {
 	*/
 	public native @ByRef SL_Matrix3f angular_velocity_convariance(); public native SL_IMUData angular_velocity_convariance(SL_Matrix3f setter);
 	/**
-	\brief Covariance matrix of the linear acceleration of the gyroscope in m/s?? (\ref linear_acceleration).
+	\brief Covariance matrix of the linear acceleration of the gyroscope in m/s² (\ref linear_acceleration).
 	\note Not available in SVO or STREAM mode.
 	*/
 	public native @ByRef SL_Matrix3f linear_acceleration_convariance(); public native SL_IMUData linear_acceleration_convariance(SL_Matrix3f setter);

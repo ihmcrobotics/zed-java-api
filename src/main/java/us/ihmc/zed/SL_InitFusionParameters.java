@@ -67,9 +67,44 @@ public class SL_InitFusionParameters extends Pointer {
 	public native @Cast("unsigned") int timeout_period_number(); public native SL_InitFusionParameters timeout_period_number(int setter);
 
 	/**
+	\brief NVIDIA graphics card id to use.
+	
+	By default the SDK will use the most powerful NVIDIA graphics card found.
+	\n However, when running several applications, or using several cameras at the same time, splitting the load over available GPUs can be useful.
+	\n This parameter allows you to select the GPU used by the sl::Camera using an ID from 0 to n-1 GPUs in your PC.
+	\n Default: -1
+	\note A non-positive value will search for all CUDA capable devices and select the most powerful.
+	 */
+	public native int sdk_gpu_id(); public native SL_InitFusionParameters sdk_gpu_id(int setter);
+	/**
+	\brief CUcontext to be used.
+	<p>
+	If your application uses another CUDA-capable library, giving its CUDA context to the ZED SDK can be useful when sharing GPU memories.
+	\n This parameter allows you to set the CUDA context to be used by the ZED SDK.
+	\n Leaving this parameter empty asks the SDK to create its own context.
+	\n Default: (empty)
+	<p>
+	\note When creating you own CUDA context, you have to define the device you will use. Do not forget to also specify it on \ref sdk_gpu_id.
+	\note <b>On Jetson</b>, you have to set the flag CU_CTX_SCHED_YIELD, during CUDA context creation.
+	\note You can also let the SDK create its own context, and use sl::Camera::getCUDAContext() to use it.
+	 */
+	public native CUctx_st sdk_cuda_ctx(); public native SL_InitFusionParameters sdk_cuda_ctx(CUctx_st setter);
+	/**
 	 * \brief Specifies the parameters used for data synchronization during fusion.
 	 *
 	 * The SynchronizationParameter struct encapsulates the synchronization parameters that control the data fusion process.
 	 */
 	public native @ByRef SL_SynchronizationParameter synchronization_parameters(); public native SL_InitFusionParameters synchronization_parameters(SL_SynchronizationParameter setter); 
+
+	/**
+	* \brief Sets the maximum resolution for all Fusion outputs, such as images and measures.
+	*
+	* The default value is (-1, -1), which allows the Fusion to automatically select the optimal resolution for the best quality/runtime ratio.
+	*
+	* - For images, the output resolution can be up to the native resolution of the camera.
+	* - For measures involving depth, the output resolution can be up to the maximum working resolution.
+	*
+	* Setting this parameter to (-1, -1) will ensure the best balance between quality and performance for depth measures.
+	*/
+	public native @ByRef SL_Resolution maximum_working_resolution(); public native SL_InitFusionParameters maximum_working_resolution(SL_Resolution setter);
 }

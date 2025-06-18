@@ -133,7 +133,7 @@ public class SL_InitParameters extends Pointer {
 	
 	The ZED SDK offers several \ref SL_DEPTH_MODE, offering various levels of performance and accuracy.
 	\n This parameter allows you to set the \ref SL_DEPTH_MODE that best matches your needs.
-	\n Default: \ref SL_DEPTH_MODE_PERFORMANCE
+	\n Default: \ref SL_DEPTH_MODE_NEURAL
 	\note Available depth mode are listed here: \ref SL_DEPTH_MODE.
 	*/
 	public native @Cast("SL_DEPTH_MODE") int depth_mode(); public native SL_InitParameters depth_mode(int setter);
@@ -147,7 +147,7 @@ public class SL_InitParameters extends Pointer {
 	\n In the range [0-100]: <ul>
 	<li>0 disable the depth stabilization (raw depth will be return)</li>
 	<li>stabilization smoothness is linear from 1 to 100</li></ul>
-	Default: 1
+	Default: 30
 	
 	\note The stabilization uses the positional tracking to increase its accuracy, 
 	so the positional tracking module will be enabled automatically when set to a value different from 0.
@@ -278,9 +278,23 @@ public class SL_InitParameters extends Pointer {
 	/**
 	 Enable or disable the image validity verification.
 	 This will perform additional verification on the image to identify corrupted data. This verification is done in the grab function and requires some computations.
-	 If an issue is found, the grab function will output a warning as sl::ERROR_CODE::CORRUPTED_FRAME.
+	 If an issue is found, the grab function will output a warning as sl_ERROR_CODE_CORRUPTED_FRAME.
 	 This version doesn't detect frame tearing currently.
 	 \n default: disabled
 	 */
-	public native int enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(int setter);
+	public native @Cast("bool") boolean enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(boolean setter);
+
+	/**
+	\brief Set a maximum size for all SDK output, like retrieveImage and retrieveMeasure functions.
+	 *
+	 * This will override the default (0,0) and instead of outputting native image size sl::Mat, the ZED SDK will take this size as default.
+	 * A custom lower size can also be used at runtime, but not bigger. This is used for internal optimization of compute and memory allocations
+	 *
+	 * The default is similar to previous version with (0,0), meaning native image size
+	 *
+	 * \note: if maximum_working_resolution field are lower than 64, it will be interpreted as dividing scale factor;
+	 * - maximum_working_resolution = sl::Resolution(1280, 2) -> 1280 x (image_height/2) = 1280 x (half height)
+	 * - maximum_working_resolution = sl::Resolution(4, 4) -> (image_width/4) x (image_height/4) = quarter size
+	 */
+	public native @ByRef SL_Resolution maximum_working_resolution(); public native SL_InitParameters maximum_working_resolution(SL_Resolution setter);
 }

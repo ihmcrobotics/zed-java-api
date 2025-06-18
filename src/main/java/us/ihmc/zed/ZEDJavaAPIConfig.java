@@ -34,5 +34,7 @@ public class ZEDJavaAPIConfig implements InfoMapper {
                .put(new Info("CUcontext").valueTypes("CUctx_st").pointerTypes("@ByPtrPtr CUctx_st"))
                .put(new Info("CUstream").valueTypes("CUstream_st").pointerTypes("@ByPtrPtr CUstream_st"))
                .put(new Info("cudaStream_t").valueTypes("CUstream_st").pointerTypes("@ByPtrPtr CUstream_st"));
+
+        infoMap.put(new Info("USB_product").skip());
     }
 }

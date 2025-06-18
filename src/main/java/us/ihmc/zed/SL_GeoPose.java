@@ -66,5 +66,5 @@ public class SL_GeoPose extends Pointer {
 	 * \brief The timestamp of SL_GeoPose.
 	 *
 	 */
-	public native @Cast("unsigned long long") long timestamp(); public native SL_GeoPose timestamp(long setter);
+	public native @Cast("uint64_t") long timestamp(); public native SL_GeoPose timestamp(long setter);
 }
