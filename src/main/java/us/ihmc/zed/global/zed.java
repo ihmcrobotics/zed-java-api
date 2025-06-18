@@ -336,15 +336,15 @@ public static final int
  */
 /** enum SL_SENSORS_UNIT */
 public static final int
-	/** m/s² (acceleration) */
+	/** m/s?? (acceleration) */
 	SL_SENSORS_UNIT_M_SEC_2 = 0,
 	/** deg/s (angular velocity) */
 	SL_SENSORS_UNIT_DEG_SEC = 1,
-	/** μT (magnetic field) */
+	/** ??T (magnetic field) */
 	SL_SENSORS_UNIT_U_T = 2,
 	/** hPa (atmospheric pressure) */
 	SL_SENSORS_UNIT_HPA = 3,
-	/** °C (temperature) */
+	/** ??C (temperature) */
 	SL_SENSORS_UNIT_CELSIUS = 4,
 	/** Hz (frequency) */
 	SL_SENSORS_UNIT_HERTZ = 5;

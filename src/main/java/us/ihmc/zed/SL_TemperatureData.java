@@ -32,12 +32,12 @@ public class SL_TemperatureData extends Pointer {
         return new SL_TemperatureData((Pointer)this).offsetAddress(i);
     }
 
-	/** \brief Temperature in °C at the IMU location (-100 if not available).*/
+	/** \brief Temperature in ??C at the IMU location (-100 if not available).*/
 	public native float imu_temp(); public native SL_TemperatureData imu_temp(float setter);
-	/** \brief Temperature in °C at the barometer location (-100 if not available).*/
+	/** \brief Temperature in ??C at the barometer location (-100 if not available).*/
 	public native float barometer_temp(); public native SL_TemperatureData barometer_temp(float setter);
-	/** \brief Temperature in °C next to the left image sensor (-100 if not available).*/
+	/** \brief Temperature in ??C next to the left image sensor (-100 if not available).*/
 	public native float onboard_left_temp(); public native SL_TemperatureData onboard_left_temp(float setter);
-	/** \brief Temperature in °C next to the right image sensor (-100 if not available).*/
+	/** \brief Temperature in ??C next to the right image sensor (-100 if not available).*/
 	public native float onboard_right_temp(); public native SL_TemperatureData onboard_right_temp(float setter);
 }

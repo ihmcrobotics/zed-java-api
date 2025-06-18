@@ -41,12 +41,12 @@ public class SL_MagnetometerData extends Pointer {
 	*/
 	public native @Cast("uint64_t") long timestamp_ns(); public native SL_MagnetometerData timestamp_ns(long setter);
 	/**
-	\brief Magnetic field local vector in microtesla (μT).
+	\brief Magnetic field local vector in microtesla (??T).
 	\note To calibrate the magnetometer sensor, please use \b ZED \b Sensor \b Viewer tool after placing the camera in the final operating environment.
 	*/
 	public native @ByRef SL_Vector3 magnetic_field_c(); public native SL_MagnetometerData magnetic_field_c(SL_Vector3 setter); //calibrated
 	/**
-	\brief Uncalibrated magnetic field local vector in microtesla (μT).
+	\brief Uncalibrated magnetic field local vector in microtesla (??T).
 	\note The magnetometer raw values are affected by soft and hard iron interferences.
 	\note The sensor must be calibrated by placing the camera in the working environment and using \b ZED \b Sensor \b Viewer tool.
 	\note Not available in SVO or STREAM mode.
