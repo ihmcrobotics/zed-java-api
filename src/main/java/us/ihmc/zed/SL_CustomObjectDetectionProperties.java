@@ -76,7 +76,6 @@ public class SL_CustomObjectDetectionProperties extends Pointer {
 	\brief Maximum tracking time threshold (in seconds) before dropping the tracked object when unseen for this amount of time.
 	<p>
 	By default, let the tracker decide internally based on the internal sub class of the tracked object.
-	Only valid for static object.
 	*/
 	public native float tracking_timeout(); public native SL_CustomObjectDetectionProperties tracking_timeout(float setter);
 
@@ -119,4 +118,62 @@ public class SL_CustomObjectDetectionProperties extends Pointer {
 	Default: -1 (no filtering)
 	*/
 	public native float min_box_height_normalized(); public native SL_CustomObjectDetectionProperties min_box_height_normalized(float setter);
+
+	/**
+	\brief Maximum allowed 3D width.
+	<p>
+	Any prediction bigger than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float max_box_width_meters(); public native SL_CustomObjectDetectionProperties max_box_width_meters(float setter);
+
+	/**
+	\brief Minimum allowed 3D width.
+	<p>
+	Any prediction smaller than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float min_box_width_meters(); public native SL_CustomObjectDetectionProperties min_box_width_meters(float setter);
+
+	/**
+	\brief Maximum allowed 3D height.
+	<p>
+	Any prediction bigger than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float max_box_height_meters(); public native SL_CustomObjectDetectionProperties max_box_height_meters(float setter);
+
+	/**
+	\brief Minimum allowed 3D height.
+	<p>
+	Any prediction smaller than that will be either discarded (if object is tracked and in SEARCHING state) or clamped.
+	Default: -1 (no filtering)
+	 */
+	public native float min_box_height_meters(); public native SL_CustomObjectDetectionProperties min_box_height_meters(float setter);
+
+	/**
+	\brief For increased accuracy, the native \ref sl::OBJECT_SUBCLASS mapping, if any.
+	<p>
+	Native objects have refined internal parameters for better 3D projection and tracking accuracy.
+	If one of the custom objects can be mapped to one the native \ref sl::OBJECT_SUBCLASS, this can help to boost the tracking accuracy.
+	<p>
+	Default: no mapping
+	 */
+	public native @Cast("SL_OBJECT_SUBCLASS") int native_mapped_class(); public native SL_CustomObjectDetectionProperties native_mapped_class(int setter);
+
+	/**
+	\brief Preset defining the expected maximum acceleration of the tracked object.
+	<p>
+	Determines how the ZED SDK interprets object acceleration, affecting tracking behavior and predictions.
+	 */
+	public native @Cast("SL_OBJECT_ACCELERATION_PRESET") int object_acceleration_preset(); public native SL_CustomObjectDetectionProperties object_acceleration_preset(int setter);
+
+	/**
+	\brief Manually override the acceleration preset.
+	<p>
+	If set, this value takes precedence over the selected preset, allowing for a custom maximum acceleration.
+	Unit is m/s^2.
+	Defaults: NaN
+	*/
+	public native float max_allowed_acceleration(); public native SL_CustomObjectDetectionProperties max_allowed_acceleration(float setter);
 }

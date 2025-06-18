@@ -69,5 +69,9 @@ public class SL_PositionalTrackingFusionParameters extends Pointer {
 	 * \brief Whether to override 2 of the 3 rotations from \ref base_footprint_to_world_transform using the IMU gravity.
 	 */
 	public native @Cast("bool") boolean set_gravity_as_origin(); public native SL_PositionalTrackingFusionParameters set_gravity_as_origin(boolean setter);
-
+	/**
+	 * \brief ID of the camera used for positional tracking. If not specified, will use the first camera called with the subscribe() method.
+	 *
+	 */
+	public native @ByRef SL_CameraIdentifier tracking_camera_id(); public native SL_PositionalTrackingFusionParameters tracking_camera_id(SL_CameraIdentifier setter);
 }

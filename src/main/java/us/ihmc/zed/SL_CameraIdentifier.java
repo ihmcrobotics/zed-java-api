@@ -32,5 +32,5 @@ public class SL_CameraIdentifier extends Pointer {
         return new SL_CameraIdentifier((Pointer)this).offsetAddress(i);
     }
 
-	public native @Cast("unsigned long long int") long sn(); public native SL_CameraIdentifier sn(long setter);
+	public native @Cast("uint64_t") long sn(); public native SL_CameraIdentifier sn(long setter);
 }

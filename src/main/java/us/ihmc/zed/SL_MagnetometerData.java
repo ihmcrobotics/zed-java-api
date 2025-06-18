@@ -39,7 +39,7 @@ public class SL_MagnetometerData extends Pointer {
 	/**
 	\brief Data acquisition timestamp in nanoseconds.
 	*/
-	public native @Cast("unsigned long long") long timestamp_ns(); public native SL_MagnetometerData timestamp_ns(long setter);
+	public native @Cast("uint64_t") long timestamp_ns(); public native SL_MagnetometerData timestamp_ns(long setter);
 	/**
 	\brief Magnetic field local vector in microtesla (??T).
 	\note To calibrate the magnetometer sensor, please use \b ZED \b Sensor \b Viewer tool after placing the camera in the final operating environment.

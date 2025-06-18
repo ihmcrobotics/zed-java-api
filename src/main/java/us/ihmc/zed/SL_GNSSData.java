@@ -56,7 +56,7 @@ public class SL_GNSSData extends Pointer {
 	 * \brief Timestamp of the GNSS position in nanoseconds (must be aligned with the camera time reference).
 	 * 
 	 */
-	public native @Cast("unsigned long long") long ts(); public native SL_GNSSData ts(long setter);
+	public native @Cast("uint64_t") long ts(); public native SL_GNSSData ts(long setter);
 	/**
 	 * \brief Covariance of the position in meter (must be expressed in the ENU coordinate system).
 	 * 

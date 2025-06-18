@@ -32,12 +32,15 @@ public static final int MAX_CAMERA_PLUGIN = 20;
 public static final int MAX_SUBMESH = 1000;
 
 // #include <stdbool.h>
-
+// #include <stdint.h>
 // #include "cuda.h"
 // Targeting ../SL_Quaternion.java
 
 
 // Targeting ../SL_Vector2.java
+
+
+// Targeting ../SL_Uint2.java
 
 
 // Targeting ../SL_Vector3.java
@@ -107,15 +110,6 @@ public static final int
 
 
 // Targeting ../SL_SensorsData.java
-
-
-
-/** enum USB_DEVICE */
-public static final int
-	USB_DEVICE_OCULUS = 0,
-	USB_DEVICE_HTC = 1,
-	USB_DEVICE_STEREOLABS = 2;
-// Targeting ../USB_product.java
 
 
 
@@ -216,18 +210,20 @@ public static final int
 	SL_RESOLUTION_QHDPLUS = 1,
 	/** 2208*1242 (x2) \n Available FPS: 15*/
 	SL_RESOLUTION_HD2K = 2,
+	/** 1920*1536 (x2) \n Available FPS: 15, 30*/
+	SL_RESOLUTION_HD1536 = 3,
 	/** 1920*1080 (x2) \n Available FPS: 15, 30*/
-	SL_RESOLUTION_HD1080 = 3,
+	SL_RESOLUTION_HD1080 = 4,
 	/** 1920*1200 (x2) \n Available FPS: 15, 30, 60*/
-	SL_RESOLUTION_HD1200 = 4,
+	SL_RESOLUTION_HD1200 = 5,
 	/** 1280*720 (x2) \n Available FPS: 15, 30, 60*/
-	SL_RESOLUTION_HD720 = 5,
+	SL_RESOLUTION_HD720 = 6,
 	/** 960*600 (x2) \n Available FPS: 15, 30, 60, 120*/
-	SL_RESOLUTION_SVGA = 6,
+	SL_RESOLUTION_SVGA = 7,
 	/** 672*376 (x2) \n Available FPS: 15, 30, 60, 100*/
-	SL_RESOLUTION_VGA = 7,
+	SL_RESOLUTION_VGA = 8,
 	/** Select the resolution compatible with the camera: <ul><li>ZED X/X Mini: \ref SL_RESOLUTION_HD1200</li><li>other cameras: \ref SL_RESOLUTION_HD720</li></ul>*/
-	SL_RESOLUTION_AUTO = 8;
+	SL_RESOLUTION_AUTO = 9;
 
 /**
 \brief Lists available units for measures.
@@ -292,12 +288,20 @@ public static final int
 	SL_MODEL_ZED_X = 4,
 	/** ZED X Mini (ZED XM) camera model */
 	SL_MODEL_ZED_XM = 5,
-	/** Virtual ZED-X generated from 2 ZED-XOne */
-	SL_MODEL_VIRTUAL_ZED_X = 10,
-	/** ZED XOne with global shutter AR0234 sensor */
+	/** ZED X HDR camera model */
+	SL_MODEL_ZED_X_HDR = 6,
+	/** ZED X HDR Mini camera model */
+	SL_MODEL_ZED_X_HDR_MINI = 7,
+	/** ZED X HDR Wide camera model */
+	SL_MODEL_ZED_X_HDR_MAX = 8,
+	/** Virtual ZED X generated from 2 ZED X One */
+	SL_MODEL_VIRTUAL_ZED_X = 11,
+	/** ZED X One with global shutter AR0234 sensor */
 	SL_MODEL_ZED_XONE_GS = 30,
-	/** ZED XOne with 4K rolling shutter IMX678 sensor */
-	SL_MODEL_ZED_XONE_UHD = 31;
+	/** ZED X One with 4K rolling shutter IMX678 sensor */
+	SL_MODEL_ZED_XONE_UHD = 31,
+	/** ZED XOne HDR */
+	SL_MODEL_ZED_XONE_HDR = 32;
 
 /**
 \brief Lists available memory type.
@@ -307,7 +311,9 @@ public static final int
 	/** Data will be stored on the CPU (processor side).*/
 	SL_MEM_CPU = 0,
 	/** Data will be stored on the GPU (graphic card side).*/
-	SL_MEM_GPU = 1;
+	SL_MEM_GPU = 1,
+	/** Data will be stored on both the CPU and GPU. */
+	SL_MEM_BOTH = 2;
 
 /**
 \brief Lists available sensor types.
@@ -447,7 +453,8 @@ public static final int
 	SL_VIDEO_SETTINGS_EXPOSURE_COMPENSATION = 19,
 	/** Level of denoising applied on both left and right images.\n Affected value should be between 0 and 100.\n Default value is 50. \note Only available for ZED X/X Mini cameras.*/
 	SL_VIDEO_SETTINGS_DENOISING = 20,
-	SL_VIDEO_SETTINGS_LAST = 21;
+	SL_VIDEO_SETTINGS_SCENE_ILLUMINANCE = 21, /** Level of illuminance of the scene. \n Can be used to determine the level of light in the scene and adjust settings accordingly. \note Read-only control. \n Available for ZED-X/Xmini cameras. \n Value provided in [0.1x]Lux for ZED-X / ZED-X Mini / ZED-XOne GS and ZED-XOne UHD cameras.*/
+	SL_VIDEO_SETTINGS_LAST = 22;
 
 @MemberGetter public static native int SL_VIDEO_SETTINGS_VALUE_AUTO();
 
@@ -706,9 +713,11 @@ public static final int
 	/** Computation mode that favors edges and sharpness.\n Requires more GPU memory and computation power.*/
 	SL_DEPTH_MODE_ULTRA = 3,
 	/** End to End Neural disparity estimation.\n Requires AI module. */
-	SL_DEPTH_MODE_NEURAL = 4,
+	SL_DEPTH_MODE_NEURAL_LIGHT = 4,
+	/** End to End Neural disparity estimation.\n Requires AI module. */
+	SL_DEPTH_MODE_NEURAL = 5,
 	/** More accurate Neural disparity estimation.\n Requires AI module. */
-	SL_DEPTH_MODE_NEURAL_PLUS = 5;
+	SL_DEPTH_MODE_NEURAL_PLUS = 6;
 
 /**
 \brief Lists possible flip modes of the camera.
@@ -836,7 +845,7 @@ public static final int
 	/** \ref SL_OBJECT_CLASS_PERSON */
 	SL_OBJECT_SUBCLASS_PERSON_HEAD = 22,
 	/** \ref SL_OBJECT_CLASS_SPORT*/
-	SL_OBJEC_SUBCLASS_SPORTSBALL = 23;
+	SL_OBJECT_SUBCLASS_SPORTSBALL = 23;
 
 /**
 \brief Lists the different states of an object's actions.
@@ -903,20 +912,19 @@ public static final int
 	SL_AI_MODELS_HUMAN_BODY_38_MEDIUM_DETECTION = 7,
 	/** Related to \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_FAST*/
 	SL_AI_MODELS_HUMAN_BODY_38_ACCURATE_DETECTION = 8,
-	//SL_AI_MODELS_HUMAN_BODY_70_FAST_DETECTION, /**< Related to \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_FAST*/
-	//SL_AI_MODELS_HUMAN_BODY_70_MEDIUM_DETECTION, /**< Related to \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_MEDIUM*/
-	//SL_AI_MODELS_HUMAN_BODY_70_ACCURATE_DETECTION, /**< Related to \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_ACCURATE*/
 	/** Related to \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_FAST*/
 	SL_AI_MODELS_PERSON_HEAD_DETECTION = 9,
 	/** Related to \ref SL_OBJECT_DETECTION_MODEL_PERSON_HEAD_BOX_ACCURATE*/
 	SL_AI_MODELS_PERSON_HEAD_ACCURATE_DETECTION = 10,
 	/** Related to \ref SL_BatchParameters.enable*/
 	SL_AI_MODELS_REID_ASSOCIATION = 11,
+	/** Related to \ref SL_DEPTH_MODE_NEURAL_LIGHT*/
+	SL_AI_MODELS_NEURAL_LIGHT_DEPTH = 12,
 	/** Related to \ref SL_DEPTH_MODE_NEURAL*/
-	SL_AI_MODELS_NEURAL_DEPTH = 12,
+	SL_AI_MODELS_NEURAL_DEPTH = 13,
 	/** Related to \ref SL_DEPTH_MODE_NEURAL_PLUS*/
-	SL_AI_MODELS_NEURAL_PLUS_DEPTH = 13,
-	SL_AI_MODELS_LAST = 14;
+	SL_AI_MODELS_NEURAL_PLUS_DEPTH = 14,
+	SL_AI_MODELS_LAST = 15;
 
 /**
 \brief Lists supported bounding box preprocessing.
@@ -929,6 +937,20 @@ public static final int
 	SL_OBJECT_FILTERING_MODE_NMS_3D = 1,
 	/** The ZED SDK will remove objects that are in the same 3D position as an already tracked object of the same class id. */
 	SL_OBJECT_FILTERING_MODE_NMS_3D_PER_CLASS = 2;
+
+/**
+\brief Lists supported bounding box preprocessing.
+ */
+/** enum SL_OBJECT_ACCELERATION_PRESET */
+public static final int
+	/** The ZED SDK will automatically determine the appropriate maximum acceleration. */
+	SL_OBJECT_ACCELERATION_PRESET_DEFAULT = 0,
+	/** Suitable for objects with relatively low maximum acceleration (e.g., a person walking). */
+	SL_OBJECT_ACCELERATION_PRESET_LOW = 1,
+	/** Suitable for objects with moderate maximum acceleration (e.g., a person running). */
+	SL_OBJECT_ACCELERATION_PRESET_MEDIUM = 2,
+	/** Suitable for objects with high maximum acceleration (e.g., a car accelerating, a kicked sports ball). */
+	SL_OBJECT_ACCELERATION_PRESET_HIGH = 3;
 
 /**
   * \brief Report the actual inference precision used
@@ -1209,10 +1231,7 @@ public static final int
 	/** The output position will be the raw position data. */
 	SL_POSITION_TYPE_RAW = 0,
 	/** The output position will be the fused position projected into the requested camera repository. */
-	SL_POSITION_TYPE_FUSION = 1,
-	/**\cond SHOWHIDDEN  */
-	SL_POSITION_TYPE_LAST = 2;
-	/**\endcond */
+	SL_POSITION_TYPE_FUSION = 1;
 // Targeting ../SL_Resolution.java
 
 
@@ -1244,6 +1263,12 @@ public static final int
 
 
 // Targeting ../SL_PositionalTrackingParameters.java
+
+
+// Targeting ../SL_Landmark.java
+
+
+// Targeting ../SL_Landmark2D.java
 
 
 // Targeting ../SL_RegionOfInterestParameters.java
@@ -1347,6 +1372,8 @@ public static final int
 // Targeting ../SL_InputType.java
 
 
+// Targeting ../SL_HealthStatus.java
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1359,34 +1386,75 @@ public static final int
 */
 /** enum SL_FUSION_ERROR_CODE */
 public static final int
-	/** Ingested covariance data must vary between ingest */
-	SL_FUSION_ERROR_CODE_GNSS_DATA_COVARIANCE_MUST_VARY = -8,
-	/** The senders are using different body formats.\n Consider changing them. */
-	SL_FUSION_ERROR_CODE_BODY_FORMAT_MISMATCH = -7,
-	/** The following module was not enabled. */
-	SL_FUSION_ERROR_CODE_MODULE_NOT_ENABLED = -6,
-	/** Some sources are provided by SVO and others by LIVE stream. */
-	SL_FUSION_ERROR_CODE_SOURCE_MISMATCH = -5,
-	/** Connection timed out. Unable to reach the sender.\n Verify the sender's IP/port. */
-	SL_FUSION_ERROR_CODE_CONNECTION_TIMED_OUT = -4,
-	/** Intra-process shared memory allocation issue.\n Multiple connections to the same data. */
-	SL_FUSION_ERROR_CODE_MEMORY_ALREADY_USED = -3,
-	/** The provided IP address format is incorrect.\n Please provide the IP in the format 'a.b.c.d', where (a, b, c, d) are numbers between 0 and 255. */
-	SL_FUSION_ERROR_CODE_INVALID_IP_ADDRESS = -2,
-	/** Standard code for unsuccessful behavior. */
-	SL_FUSION_ERROR_CODE_FAILURE = -1,
-	/** Standard code for successful behavior. */
+	/**
+	\brief Significant differences observed between sender's FPS. Fusion quality will be affected.
+	*/
+	SL_FUSION_ERROR_CODE_FUSION_INCONSISTENT_FPS = -5,
+	/**
+	\brief Fusion FPS is too low because at least one sender has an FPS lower than 10 FPS. Fusion quality will be affected.
+	 */
+	SL_FUSION_ERROR_CODE_FUSION_FPS_TOO_LOW = -4,
+	/**
+	\brief You have attempted to ingest GNSSData into the Fusion system with an invalid timestamp. It is essential to ensure that the
+	timestamp of your GNSSData is set correctly. This issue may arise from a unit error in the ingested timestamp, such as providing
+	the timestamp in microseconds instead of nanoseconds.
+	 */
+	SL_FUSION_ERROR_CODE_INVALID_TIMESTAMP = -3,
+	/**
+	\brief This is a warning message notifying you about an issue encountered while ingesting GNSSData into the Fusion system. The
+	problem lies in the very low covariance value provided. To ensure stability and prevent potential issues, the system will
+	automatically clamp this covariance value.
+	 */
+	SL_FUSION_ERROR_CODE_INVALID_COVARIANCE = -2,
+	/**
+	\brief All data from all sources has been consumed. No new data is available for processing.
+	 */
+	SL_FUSION_ERROR_CODE_NO_NEW_DATA_AVAILABLE = -1,
+	/**
+	\brief Standard code indicating successful behavior.
+	 */
 	SL_FUSION_ERROR_CODE_SUCCESS = 0,
-	/** Significant differences observed between sender's FPS. */
-	SL_FUSION_ERROR_CODE_FUSION_INCONSISTENT_FPS = 1,
-	/** At least one sender has an FPS lower than 10 FPS. */
-	SL_FUSION_ERROR_CODE_FUSION_FPS_TOO_LOW = 2,
-	/** Problem detected with the ingested timestamp.\n Sample data will be ignored. */
-	SL_FUSION_ERROR_CODE_INVALID_TIMESTAMP = 3,
-	/** Problem detected with the ingested covariance.\n Sample data will be ignored. */
-	SL_FUSION_ERROR_CODE_INVALID_COVARIANCE = 4,
-	/** All data from all sources has been consumed.\n No new data is available for processing. */
-	SL_FUSION_ERROR_CODE_NO_NEW_DATA_AVAILABLE = 5;
+	/**
+	\brief  This is a warning message indicating an issue with the ingestGNSSData function call. The problem lies in the gnss_status field of
+	the GNSSData parameter, which is currently set to UNKNOWN. To enhance the accuracy of the VPS (Visual Positioning System), it is essential
+	to provide an appropriate value for this field. To rectify this issue, please consider setting the gnss_status field to a valid value that
+	reflects the status of your GNSS sensor. If your GNSS sensor is unable to output a status, it is recommended to set the gnss_status field
+	to sl::GNSS_STATUS::SINGLE.
+	 */
+	SL_FUSION_ERROR_CODE_GNSS_DATA_NEED_FIX = 1,
+	/**
+	\brief  It appears that you have made multiple calls to the ingestGNSSData function using the same GNSSData covariance. This warning is
+	intended to prevent users from repeatedly ingesting a fixed or manually crafted covariance.
+	 */
+	SL_FUSION_ERROR_CODE_GNSS_DATA_COVARIANCE_MUST_VARY = 2,
+	/**
+	\brief  Senders are using different body formats. Please use the same body format.
+	 */
+	SL_FUSION_ERROR_CODE_BODY_FORMAT_MISMATCH = 3,
+	/**
+	\brief The following module is not enabled. Please enable it to proceed.
+	 */
+	SL_FUSION_ERROR_CODE_MODULE_NOT_ENABLED = 4,
+	/**
+	\brief Some sources are provided by SVO and others by LIVE stream.
+	 */
+	SL_FUSION_ERROR_CODE_SOURCE_MISMATCH = 5,
+	/**
+	\brief Connection timed out. Unable to reach the sender. Verify the sender's IP address and port.
+	 */
+	SL_FUSION_ERROR_CODE_CONNECTION_TIMED_OUT = 6,
+	/**
+	\brief Intra-process shared memory allocation issue. Multiple connections to the same data. Check memory usage.
+	 */
+	SL_FUSION_ERROR_CODE_MEMORY_ALREADY_USED = 7,
+	/**
+	\brief The provided IP address format is incorrect. Please provide a valid IP address in the format 'a.b.c.d'.
+	 */
+	SL_FUSION_ERROR_CODE_INVALID_IP_ADDRESS = 8,
+	/**
+	\brief Standard code indicating unsuccessful behavior.
+	 */
+	SL_FUSION_ERROR_CODE_FAILURE = 9;
 
 /**
 \enum SL_SENDER_ERROR_CODE
@@ -1394,16 +1462,12 @@ public static final int
 */
 /** enum SL_SENDER_ERROR_CODE */
 public static final int
-	/** The sender has been disconnected.*/
-	SL_SENDER_ERROR_CODE_DISCONNECTED = -1,
-	/** Standard code for successful behavior.*/
-	SL_SENDER_ERROR_CODE_SUCCESS = 0,
-	/** The sender encountered a grab error.*/
-	SL_SENDER_ERROR_CODE_GRAB_ERROR = 1,
-	/** The sender does not run with a constant frame rate.*/
-	SL_SENDER_ERROR_CODE_INCONSISTENT_FPS = 2,
-	/** The frame rate of the sender is lower than 10 FPS.*/
-	SL_SENDER_ERROR_CODE_FPS_TOO_LOW = 3;
+	SL_SENDER_ERROR_CODE_GRAB_ERROR = -3, /*< The sender encountered a grab error. Check sender's hardware and connection. */
+	SL_SENDER_ERROR_CODE_INCONSISTENT_FPS = -2, /*< The sender does not run with a constant frame rate. */
+	/** The frame rate of the sender is lower than 10 FPS. Check sender's settings and performance. */
+	SL_SENDER_ERROR_CODE_FPS_TOO_LOW = -1,
+	SL_SENDER_ERROR_CODE_SUCCESS = 0, /*< Standard code indicating successful behavior. */
+	SL_SENDER_ERROR_CODE_DISCONNECTED = 1; /*< The sender has been disconnected. */
 
 /**
 \enum SL_COMM_TYPE
@@ -1421,28 +1485,48 @@ public static final int
  */
 /** enum SL_GNSS_STATUS */
 public static final int
-	/** No GNSS fix data is available. */
+	/**
+	\brief  No GNSS fix data is available.
+	 */
 	SL_GNSS_STATUS_UNKNOWN = 0,
-	/** Single Point Positioning */
+	/**
+	\brief Single Point Positioning
+	 */
 	SL_GNSS_STATUS_SINGLE = 1,
-	/** Differential GNSS */
+	/**
+	\brief Differential GNSS
+	 */
 	SL_GNSS_STATUS_DGNSS = 2,
-	/** Real-Time Kinematic (RTK) GNSS fix in fixed mode. */
+	/**
+	\brief Real Time Kinematic Fixed
+	*/
 	SL_GNSS_STATUS_RTK_FIX = 3,
-	/** Real-Time Kinematic (RTK) GNSS fix in float mode. */
-	SL_GNSS_STATUS_RTK_FLOAT = 4,
-	/** Precise Positioning Service */
-	SL_GNSS_STATUS_PPS = 5;
+	/**
+	\brief Precise Positioning Service
+	 */
+	SL_GNSS_STATUS_PPS = 5,
+	/**
+	\brief Real Time Kinematic Float
+	 */
+	SL_GNSS_STATUS_RTK_FLOAT = 4;
 
 /** enum SL_GNSS_MODE */
 public static final int
-	/** No GNSS fix data is available. */
+	/**
+	 * \brief No GNSS fix data is available.
+	 */
 	SL_GNSS_MODE_UNKNOWN = 0,
-	/** No GNSS fix is available. */
+	/**
+	 * \brief No GNSS fix is available.
+	 */
 	SL_GNSS_MODE_NO_FIX = 1,
-	/** 2D GNSS fix, providing latitude and longitude coordinates but without altitude information. */
+	/**
+	 * \brief 2D GNSS fix, providing latitude and longitude coordinates but without altitude information.
+	 */
 	SL_GNSS_MODE_FIX_2D = 2,
-	/** 3D GNSS fix, providing latitude, longitude, and altitude coordinates. */
+	/**
+	 * \brief 3D GNSS fix, providing latitude, longitude, and altitude coordinates.
+	 */
 	SL_GNSS_MODE_FIX_3D = 3;
 
 /**
@@ -1450,14 +1534,32 @@ public static final int
  */
 /** enum SL_GNSS_FUSION_STATUS */
 public static final int
-	/** The GNSS fusion module is calibrated and working successfully. */
+	/**
+	 * \brief The GNSS fusion module is calibrated and working successfully.
+	 */
 	SL_GNSS_FUSION_STATUS_OK = 0,
-	/** The GNSS fusion module is not enabled. */
-	SL_GNSS_FUSION_STATUS_OFF = 1,
-	/** Calibration of the GNSS/VIO fusion module is in progress. */
+	/**
+	 * \brief The GNSS fusion module is not enabled.
+	 */
+	SL_GNSS_FUSION_STATUS_OFF = 1,							
+	/**
+	 * \brief Calibration of the GNSS/VIO fusion module is in progress.
+	 */
 	SL_GNSS_FUSION_STATUS_CALIBRATION_IN_PROGRESS = 2,
-	/** Re-alignment of GNSS/VIO data is in progress, leading to potentially inaccurate global position. */
+	/**
+	 * \brief Re-alignment of GNSS/VIO data is in progress, leading to potentially inaccurate global position.
+	 */
 	SL_GNSS_FUSION_STATUS_RECALIBRATION_IN_PROGRESS = 3;
+
+/**
+ * \brief Enum to define the reference frame of the fusion SDK.
+ */
+/** enum SL_FUSION_REFERENCE_FRAME */
+public static final int
+	/** The world frame is the reference frame of the world according to the fused positional Tracking*/
+	SL_FUSION_REFERENCE_FRAME_WORLD = 0,
+	/** The base link frame is the reference frame where camera calibration is given*/
+	SL_FUSION_REFERENCE_FRAME_BASELINK = 1;
 // Targeting ../SL_FusedPositionalTrackingStatus.java
 
 
@@ -1501,6 +1603,9 @@ public static final int
 
 
 // Targeting ../SL_UTM.java
+
+
+// Targeting ../SL_ENU.java
 
 
 // Targeting ../SL_GNSSCalibrationParameters.java
@@ -1559,13 +1664,6 @@ public static final int
     @param camera_id : id of the instance to unload.
     */
     public static native void sl_unload_instance(int camera_id);
-
-    /**
-    \brief Checks usb devices connected.
-    *param device : type of device to find.
-    @return true if connected.
-    */
-    public static native @Cast("bool") boolean sl_find_usb_device(@Cast("USB_DEVICE") int device);
 
     /**
     * \brief Creates a camera with resolution mode, fps and id for linux.
@@ -1709,6 +1807,18 @@ public static final int
     public static native int sl_grab(int camera_id, SL_RuntimeParameters runtime);
 
     /**
+    \brief Read the latest images and IMU from the camera and rectify the images.
+    <p>
+    This method is meant to be called frequently in the main loop of your application.
+    <p>
+    \note If no new frames is available until timeout is reached, read() will return \ref ERROR_CODE "SL_ERROR_CODE_CAMERA_NOT_DETECTED" since the camera has probably been disconnected.
+    \note Returned errors can be displayed using toString().
+    <p>
+    @return \ref ERROR_CODE "SL_ERROR_CODE_SUCCESS" means that no problem was encountered.
+     */
+    public static native int sl_read(int camera_id);
+
+    /**
     \brief Lists all the connected devices with their associated information.
     <p>
     This method lists all the cameras available and provides their serial number, models and other information.
@@ -1821,9 +1931,10 @@ public static final int
     \note The method will return sl_ERROR_CODE_FAILURE if not in SVO mode.
     \warning You need to call sl_get_svo_data_size for the key before calling this method to correctly retrieve the data.
      */
-    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") BytePointer key, int nb_data, SL_SVOData data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
-    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") ByteBuffer key, int nb_data, SL_SVOData data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
-    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") byte[] key, int nb_data, SL_SVOData data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
+    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") BytePointer key, int nb_data, @Cast("SL_SVOData**") PointerPointer data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
+    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") BytePointer key, int nb_data, @ByPtrPtr SL_SVOData data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
+    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") ByteBuffer key, int nb_data, @ByPtrPtr SL_SVOData data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
+    public static native @Cast("SL_ERROR_CODE") int sl_retrieve_svo_data(int camera_id, @Cast("char*") byte[] key, int nb_data, @ByPtrPtr SL_SVOData data, @Cast("unsigned long long") long ts_begin, @Cast("unsigned long long") long ts_end);
 
     /**
     \brief Gets the number of external channels that can be retrieved from the SVO file.
@@ -1914,6 +2025,14 @@ public static final int
     @param frame_number : The number of the desired frame to be decoded.
      */
     public static native void sl_set_svo_position(int camera_id, int frame_number);
+
+    /**
+    \brief Pauses or resumes SVO reading
+    @param camera_id : Id of the camera instance.
+    @param status : If true, the reading is paused. If false, the reading is resumed.
+    \note This is only relevant for SVO \ref InitParameters::svo_real_time_mode
+     */
+    public static native void sl_pause_svo_reading(int camera_id, @Cast("bool") boolean status);
 
     /**
     \brief Returns the camera FPS.
@@ -2217,6 +2336,16 @@ public static final int
     public static native @Cast("unsigned int") int sl_get_frame_dropped_count(int camera_id);
 
 
+    /**
+	* \brief Gets the current status of the camera.
+	* @param camera_id : Id of the camera instance.
+	* @return HealthStatus Structure containing the self diagnostic results of the image/depth/sensors
+    */
+	public static native SL_HealthStatus sl_get_health_status(int camera_id);
+
+    public static native SL_Resolution sl_get_retrieve_image_resolution(int camera_id, SL_Resolution res);
+
+    public static native SL_Resolution sl_get_retrieve_measure_resolution(int camera_id, SL_Resolution res);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////// Motion tracking ///////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2266,6 +2395,31 @@ public static final int
     public static native int sl_get_position_array(int camera_id, FloatBuffer pose, @Cast("SL_REFERENCE_FRAME") int reference_frame);
     public static native int sl_get_position_array(int camera_id, float[] pose, @Cast("SL_REFERENCE_FRAME") int reference_frame);
 
+    /**
+    \brief Get the current positional tracking landmarks.
+    \Note the landmarks array has to be freed by the user.
+    @param camera_id : id of the camera instance.
+    @param landmarks Array of presents landmarks.
+	@param count number of landmarks (size of the landmarks array).
+    @return ERROR_CODE that indicate if the function succeed or not.
+     */
+	public static native int sl_get_positional_tracking_landmarks(int camera_id, @Cast("SL_Landmark**") PointerPointer landmarks, @Cast("uint32_t*") IntPointer count);
+	public static native int sl_get_positional_tracking_landmarks(int camera_id, @ByPtrPtr SL_Landmark landmarks, @Cast("uint32_t*") IntPointer count);
+	public static native int sl_get_positional_tracking_landmarks(int camera_id, @ByPtrPtr SL_Landmark landmarks, @Cast("uint32_t*") IntBuffer count);
+	public static native int sl_get_positional_tracking_landmarks(int camera_id, @ByPtrPtr SL_Landmark landmarks, @Cast("uint32_t*") int[] count);
+
+    /**
+    \brief Get the current positional tracking 2d landmarks.
+    \Note the landmarks array has to be freed by the user.
+    @param camera_id : id of the camera instance.
+    @param landmarks 2d Array of landmarks.
+    @param count number of landmarks (size of the landmarks array).
+    @return ERROR_CODE that indicate if the function succeed or not.
+     */
+    public static native int sl_get_positional_tracking_landmarks_2d(int camera_id, @Cast("SL_Landmark2D**") PointerPointer landmarks2d, @Cast("uint32_t*") IntPointer count);
+    public static native int sl_get_positional_tracking_landmarks_2d(int camera_id, @ByPtrPtr SL_Landmark2D landmarks2d, @Cast("uint32_t*") IntPointer count);
+    public static native int sl_get_positional_tracking_landmarks_2d(int camera_id, @ByPtrPtr SL_Landmark2D landmarks2d, @Cast("uint32_t*") IntBuffer count);
+    public static native int sl_get_positional_tracking_landmarks_2d(int camera_id, @ByPtrPtr SL_Landmark2D landmarks2d, @Cast("uint32_t*") int[] count);
     /**
      \brief Return the current status of positional tracking module.
      @return SL_POSITIONAL_TRACKING_STATUS current status of positional tracking module.
@@ -2706,7 +2860,7 @@ public static final int
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_INVALID_RESOLUTION" if the resolution is higher than one provided by getCameraInformation().camera_configuration.resolution.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" if another error occurred.
      */
-    public static native int sl_retrieve_measure(int camera_id, Pointer measure_ptr, @Cast("SL_MEASURE") int type, @Cast("SL_MEM") int mem, int width, int height);
+    public static native int sl_retrieve_measure(int camera_id, Pointer measure_ptr, @Cast("SL_MEASURE") int type, @Cast("SL_MEM") int mem, int width, int height, Pointer custream);
     /**
     \brief Retrieves an image texture from the ZED SDK in a human-viewable format.
     
@@ -2720,7 +2874,7 @@ public static final int
     @param height : Height of the texture in pixel.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if the retrieve succeeded.
      */
-    public static native int sl_retrieve_image(int camera_id, Pointer image_ptr, @Cast("SL_VIEW") int type, @Cast("SL_MEM") int mem, int width, int height);
+    public static native int sl_retrieve_image(int camera_id, Pointer image_ptr, @Cast("SL_VIEW") int type, @Cast("SL_MEM") int mem, int width, int height, Pointer custream);
 
     /**
     \brief Convert Image format from Unsigned char to Signed char, designed for Unreal Engine pipeline, works on GPU memory.
@@ -2729,7 +2883,7 @@ public static final int
     @param stream : a cuda stream to put the compute to (def. 0)
     \note If the Output Mat does not satisfies the requirements, it is freed and re-allocated.
     */
-    public static native int sl_convert_image(Pointer image_in_ptr, Pointer image_signed_ptr, CUstream_st stream);
+    public static native int sl_convert_image(Pointer image_in_ptr, Pointer image_signed_ptr, Pointer stream);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////// Streaming Sender //////////////////////////////////////////////////////////////////////
@@ -2878,6 +3032,18 @@ public static final int
      */
     public static native void sl_disable_object_detection(int camera_id, @Cast("unsigned int") int instance_id, @Cast("bool") boolean force_disable_all_instances);
 
+
+    /**
+    \brief Set the Object detection module instance runtime parameters
+     By default the object detection module will use the parameters set in the ObjectDetectionRuntimeParameters constructor.
+     This can be changed at any time, however since the processing is done in parallel, the parameters will be used for the next inference.
+     This function can be called only on parameters change, the previous values will be applied during inference.
+    @param camera_id : Id of the camera instance.
+    @param params : ObjectDetectionRuntimeParameters parameters
+    @param instance_id : Object detection instance id, by default the first instance
+    */
+    public static native int sl_set_object_detection_runtime_parameters(int camera_id, @ByVal SL_ObjectDetectionRuntimeParameters object_detection_parameters, @Cast("unsigned int") int instance_id);
+
     /**
     \brief Initializes and starts the Deep Learning Body Tracking module.
     
@@ -2920,6 +3086,16 @@ public static final int
     @param force_disable_all_instances : Should disable all instances of the tracking module module or just <b>instance_id</b>.
      */
     public static native void sl_disable_body_tracking(int camera_id, @Cast("unsigned int") int instance_id, @Cast("bool") boolean force_disable_all_instances);
+
+    /**
+    \brief Set the Body tracking module instance runtime parameters
+     By default the Body tracking module will use the parameters set in the BodyTrackingRuntimeParameters constructor.
+     This can be changed at any time, however since the processing is done in parallel, the parameters will be used for the next inference.
+     This function can be called only on parameters change, the previous values will be applied during inference.
+    @param params : BodyTrackingRuntimeParameters parameters
+    @param instance_id : Body tracking instance id, by default the first instance
+    */
+    public static native int sl_set_body_tracking_runtime_parameters(int camera_id, @ByVal SL_BodyTrackingRuntimeParameters body_tracking_parameters, @Cast("unsigned int") int instance_id);
 
     /**
     \brief Generate a UUID like unique id to help identify and track AI detections.
@@ -2971,6 +3147,17 @@ public static final int
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if everything went fine, \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" otherwise.
      */
     public static native int sl_retrieve_custom_objects(int camera_id, SL_CustomObjectDetectionRuntimeParameters object_detection_runtime_parameters, SL_Objects objects, @Cast("unsigned int") int instance_id);
+
+    /**
+    \brief Set the Object detection module instance runtime parameters when using the Custom model (OBJECT_DETECTION_MODEL::CUSTOM_BOX_OBJECTS and CUSTOM_BOX_OBJECTS::CUSTOM_YOLOLIKE_BOX_OBJECTS)
+     By default the object detection module will use the parameters set in the CustomObjectDetectionRuntimeParameters constructor.
+     This can be changed at any time, however since the processing is done in parallel, the parameters will be used for the next inference.
+     This function can be called only on parameters change, the previous values will be applied during inference.
+    @param camera_id : Id of the camera instance.
+    @param params : CustomObjectDetectionRuntimeParameters parameters
+    @param instance_id : Object detection instance id, by default the first instance
+    */
+    public static native int sl_set_custom_object_detection_runtime_parameters(int camera_id, @ByVal SL_CustomObjectDetectionRuntimeParameters custom_object_detection_parameters, @Cast("unsigned int") int instance_id);
 
     /**
     \brief Retrieve bodies detected by the body tracking module.
@@ -3072,10 +3259,11 @@ public static final int
      * @param measure: the requested measure type, by default DEPTH (F32_C1)
      * @param width: the requested width of the output image, can be lower or equal (default) to the original image width.
      * @param height: the requested height of the output image, can be lower or equal (default) to the original image height.
+     *@param reference_frame: the requested reference frame, by default BASELINK. it is only available for fused point clouds
      * @return \ref FUSION_ERROR_CODE "SUCCESS" if it goes as it should, otherwise it returns an FUSION_ERROR_CODE.
      * \note Only MEASURE: DEPTH, XYZ, XYZRGBA, XYZBGRA, XYZARGB, XYZABGR, DEPTH_U16_MM are available.
      */
-    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_retrieve_measure(Pointer mat, SL_CameraIdentifier uuid, @Cast("SL_MEASURE") int measure, int width, int height);
+    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_retrieve_measure(Pointer mat, SL_CameraIdentifier uuid, @Cast("SL_MEASURE") int measure, int width, int height, @Cast("SL_FUSION_REFERENCE_FRAME") int reference_frame);
 
     /**
      * \brief Remove the specified camera from data provider.
@@ -3092,6 +3280,14 @@ public static final int
     * \return SL_FUSION_ERROR_CODE
     * */
     public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_update_pose(SL_CameraIdentifier uuid, SL_Vector3 pose_translation, SL_Quaternion pose_rotation);
+
+    /**
+     * \brief Get the specified camera position inside fusion WORLD.
+     * @param uuid: The requested camera identifier.
+     * @param pose: The World position of the camera, regarding the other camera of the setup.
+     * @return \ref FUSION_ERROR_CODE "SUCCESS" if it goes as it should, otherwise it returns an FUSION_ERROR_CODE.
+     */
+    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_get_pose(SL_CameraIdentifier uuid, SL_Vector3 pose_translation, SL_Quaternion pose_rotation);
     
     /*
     * \brief Returns the state of a connected data sender.
@@ -3150,12 +3346,13 @@ public static final int
 
     /**
     * \brief retrieves a list of bodies (in SL_Bodies class type) seen by all cameras and merged as if it was seen by a single super-camera.
-    *\note Internal calls retrieveObjects() for all listed cameras, then merged into a single SL_Bodies
-    * @param bodies [out] : list of objects seen by all available cameras
+    *\note Internal calls retrieveBodies() for all listed cameras, then merged into a single SL_Bodies
+    * @param bodies [out] : list of bodies seen by all available cameras
+    * @param reference_frame: The reference frame in which the objects will be expressed.
     * \note Only the 3d informations is available in the returned object.
     * @return SL_FUSION_ERROR_CODE
     */
-    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_retrieve_bodies(SL_Bodies bodies, SL_BodyTrackingFusionRuntimeParameters rt, @ByVal SL_CameraIdentifier uuid);
+    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_retrieve_bodies(SL_Bodies bodies, SL_BodyTrackingFusionRuntimeParameters rt, @ByVal SL_CameraIdentifier uuid, @Cast("SL_FUSION_REFERENCE_FRAME") int reference_frame);
 
     /**
      * \brief get the stats of a given camera in the Fusion API side
@@ -3204,6 +3401,22 @@ public static final int
     /////////////////////////////////////////////////////////////////////
     /////////////////////////// GNSS Fusion /////////////////////////////
     /////////////////////////////////////////////////////////////////////
+
+    /**
+     * \brief Convert a ENU position expressed inside the Fusion coordinate system to a global world coordinate.
+     * @param in Input enu coordinate.
+     * @param out Converted position in lat/lng coordinate system.
+     * @return ERROR_CODE FAILURE if the conversion failed, SUCCESS otherwise.
+     */
+    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_enu_to_geo(SL_ENU in, SL_LatLng out);
+
+    /**
+     * \brief Convert a global world coordinate to a ENU position expressed inside the Fusion coordinate system.
+     * @param in Input lat/lng coordinate.
+     * @param out Converted position in ENU coordinate system.
+     * @return ERROR_CODE FAILURE if the conversion failed, SUCCESS otherwise.
+     */
+    public static native @Cast("SL_FUSION_ERROR_CODE") int sl_fusion_geo_to_enu(SL_LatLng in, SL_ENU out);
 
     /**
      * \brief Add GNSS that will be used by fusion for computing fused pose.
@@ -3700,6 +3913,85 @@ public static final int
     @param ptr2 : Pointer of the second matrix to swap.
     */
     public static native void sl_mat_swap(Pointer ptr_1, Pointer ptr_2);
+
+    /**
+    \brief Convert the color channels of the Mat (RGB<->BGR or RGBA<->BGRA)
+     * This methods works only on 8U_C4 or 8U_C3
+     */
+    public static native int sl_mat_convert_color(Pointer ptr, @Cast("SL_MEM") int memory, @Cast("bool") boolean swap_RB_channels, Pointer stream);
+
+    /**
+    \brief Convert the color channels of the Mat into another Mat
+     * This methods works only on 8U_C4 if remove_alpha_channels is enabled, or 8U_C4 and 8U_C3 if swap_RB_channels is enabled
+     * The inplace method sl::Mat::convertColor can be used for only swapping the Red and Blue channel efficiently
+     */
+    public static native int sl_convert_color(Pointer mat1, Pointer mat2, @Cast("bool") boolean swap_RB_channels, @Cast("bool") boolean remove_alpha_channels, @Cast("SL_MEM") int memory, Pointer stream);
+
+    /**
+    \brief Convert an image into a GPU Tensor in planar channel configuration (NCHW), ready to use for deep learning model
+    @param image_in : input image to convert
+    @param tensor_out : output GPU tensor
+    @param resolution_out : resolution of the output image, generally square, although not mandatory
+    @param scalefactor : Scale factor applied to each pixel value, typically to convert the char value into [0-1] float
+    @param mean : mean, statistic to normalized the pixel values, applied AFTER the scale. For instance for imagenet statistics the mean would be sl::float3(0.485, 0.456, 0.406)
+    @param stddev : standard deviation, statistic to normalized the pixel values, applied AFTER the scale. For instance for imagenet statistics the standard deviation would be sl::float3(0.229, 0.224, 0.225)
+    @param keep_aspect_ratio : indicates if the original width and height ratio should be kept using padding (sometimes refer to as letterboxing) or if the image should be stretched
+    @param swap_RB_channels : indicates if the Red and Blue channels should be swapped (RGB<->BGR or RGBA<->BGRA)
+    @param stream : a cuda stream to put the compute
+     */
+    public static native int sl_blob_from_image(Pointer image_in, Pointer tensor_out, @ByVal SL_Resolution resolution_out,
+            float scalefactor, @ByVal SL_Vector3 mean, @ByVal SL_Vector3 stddev, @Cast("bool") boolean keep_aspect_ratio, @Cast("bool") boolean swap_RB_channels,
+            Pointer stream);
+
+    /**
+    \brief Convert a list of images into a GPU Tensor in planar channel configuration (NCHW), ready to use for deep learning model
+    @param image_in : input images to convert
+    @param nb_images : number of images to convert
+    @param tensor_out : output GPU tensor batched
+    @param resolution_out : resolution of the output image, generally square, although not mandatory
+    @param scalefactor : Scale factor applied to each pixel value, typically to convert the char value into [0-1] float
+    @param mean : mean, statistic to normalized the pixel values, applied AFTER the scale. For instance for imagenet statistics the mean would be sl::float3(0.485, 0.456, 0.406)
+    @param stddev : standard deviation, statistic to normalized the pixel values, applied AFTER the scale. For instance for imagenet statistics the standard deviation would be sl::float3(0.229, 0.224, 0.225)
+    @param keep_aspect_ratio : indicates if the original width and height ratio should be kept using padding (sometimes refer to as letterboxing) or if the image should be stretched
+    @param swap_RB_channels : indicates if the Red and Blue channels should be swapped (RGB<->BGR or RGBA<->BGRA)
+    @param stream : a cuda stream to put the compute
+     */
+
+	public static native int sl_blob_from_images(@Cast("void**") PointerPointer image_in, int nb_images, Pointer tensor_out, @ByVal SL_Resolution resolution_out,
+			float scalefactor, @ByVal SL_Vector3 mean, @ByVal SL_Vector3 stddev, @Cast("bool") boolean keep_aspect_ratio, @Cast("bool") boolean swap_RB_channels,
+	        Pointer stream);
+	public static native int sl_blob_from_images(@Cast("void**") @ByPtrPtr Pointer image_in, int nb_images, Pointer tensor_out, @ByVal SL_Resolution resolution_out,
+			float scalefactor, @ByVal SL_Vector3 mean, @ByVal SL_Vector3 stddev, @Cast("bool") boolean keep_aspect_ratio, @Cast("bool") boolean swap_RB_channels,
+	        Pointer stream);
+
+    ///**
+    //\brief Check if the camera is a ZED One (Monocular) or ZED (Stereo)
+    //\param m : Camera model
+    //*/
+    //INTERFACE_API bool sl_is_camera_one(enum SL_MODEL m);
+
+    ///**
+    //\brief Check if a resolution is available for a given camera model
+    //\param r : Resolution to check
+    //\param m : Camera model
+    //*/
+    //INTERFACE_API bool sl_is_resolution_available(enum SL_RESOLUTION r, enum SL_MODEL m);
+
+    ///**
+    //\brief Check if a frame rate is available for a given resolution and camera model
+    //\param fps : Frame rate to check
+    //\param r : Resolution to check
+    //\param m : Camera model
+    //*/
+    //INTERFACE_API bool sl_is_FPS_available(int fps, enum SL_RESOLUTION r, enum SL_MODEL m);
+
+    ///**
+    //\brief Check if a resolution for a given camera model is available for HDR
+    //\param r : Resolution to check
+    //\param m : Camera model
+    //*/
+    //INTERFACE_API bool sl_is_HDR_available(enum SL_RESOLUTION r, enum SL_MODEL m);
+
 
 // #ifdef __cplusplus
 // #endif

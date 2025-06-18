@@ -59,8 +59,8 @@ public class SL_ObjectsBatch extends Pointer {
 	public native @ByRef SL_Vector3 velocities(int i); public native SL_ObjectsBatch velocities(int i, SL_Vector3 setter);
 	@MemberGetter public native SL_Vector3 velocities();
 	/** \brief Array of timestamps for each object.*/
-	public native @Cast("unsigned long long") long timestamps(int i); public native SL_ObjectsBatch timestamps(int i, long setter);
-	@MemberGetter public native @Cast("unsigned long long*") LongPointer timestamps();
+	public native @Cast("uint64_t") long timestamps(int i); public native SL_ObjectsBatch timestamps(int i, long setter);
+	@MemberGetter public native @Cast("uint64_t*") LongPointer timestamps();
 	
 	/**
 	\brief Array of 2D bounding boxes for each object.

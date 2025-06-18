@@ -39,7 +39,7 @@ public class SL_IMUData extends Pointer {
 	/**
 	\brief Data acquisition timestamp in nanoseconds.
 	*/
-	public native @Cast("unsigned long long") long timestamp_ns(); public native SL_IMUData timestamp_ns(long setter);
+	public native @Cast("uint64_t") long timestamp_ns(); public native SL_IMUData timestamp_ns(long setter);
 	/**
 	\brief Gets the angular velocity vector of the gyroscope in deg/s.
 	<p>

@@ -35,9 +35,9 @@ public class SL_Resolution extends Pointer {
 	/**
 	\brief Width of the image in pixels.
 	*/
-	public native long width(); public native SL_Resolution width(long setter);
+	public native int width(); public native SL_Resolution width(int setter);
 	/**
 	\brief Height of the image in pixels.
 	*/
-	public native long height(); public native SL_Resolution height(long setter);
+	public native int height(); public native SL_Resolution height(int setter);
 }

@@ -44,7 +44,7 @@ public class SL_PoseData extends Pointer {
 	
 	This timestamp should be compared with the camera timestamp for synchronization.
 	*/
-	public native @Cast("unsigned long long") long timestamp(); public native SL_PoseData timestamp(long setter);
+	public native @Cast("uint64_t") long timestamp(); public native SL_PoseData timestamp(long setter);
 	/** \brief Quaternion/orientation component of the \ref SL_PoseData.*/
 	public native @ByRef SL_Quaternion rotation(); public native SL_PoseData rotation(SL_Quaternion setter);
 	/** \brief Translation component of the \ref SL_PoseData.*/

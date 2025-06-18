@@ -46,7 +46,7 @@ public class SL_Objects extends Pointer {
     <p>
     This value is especially useful for the async mode to synchronize the data.
 	 */
-	public native @Cast("unsigned long long") long timestamp(); public native SL_Objects timestamp(long setter);
+	public native @Cast("uint64_t") long timestamp(); public native SL_Objects timestamp(long setter);
 	/**
 	\brief Whether \ref object_list has already been retrieved or not.
 	 */
