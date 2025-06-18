@@ -5,7 +5,7 @@ mkdir cppbuild
 cd cppbuild
 
 if [ ! -f "zed-c-api.tar.gz" ]; then
-  wget https://github.com/stereolabs/zed-c-api/archive/refs/heads/main.zip
+  curl -O https://github.com/stereolabs/zed-c-api/archive/refs/heads/main.zip
 fi
 
 unzip main.zip
