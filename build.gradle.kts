@@ -1,45 +1,25 @@
 plugins {
-    id("java-library")
-    id("maven-publish")
+   id("java")
+   id("us.ihmc.ihmc-build")
 }
 
-group = "us.ihmc"
-version = "5.0.0"
+ihmc {
+   group = "us.ihmc"
+   version = "5.0.0"
+   vcsUrl = "https://github.com/ihmcrobotics/zed-java-api"
+   openSource = true
+   description = "Use Stereolabs sensors such as ZED 2, ZED 2i, ZED X, ZED Mini, ZED X Mini from Java."
 
-repositories {
-    mavenCentral()
+   configureDependencyResolution()
+   configurePublications()
 }
 
-java {
-    withSourcesJar()
+tasks.javadoc {
+   // The javadoc compiler has a lot of errors with the javacpp generated comments, but we need a javadoc.jar for publishing
+   exclude("us/ihmc/zed/**")
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-
-            groupId = project.group.toString()
-            artifactId = "zed-java-api"
-            version = project.version.toString()
-        }
-    }
-
-    repositories {
-        maven {
-            val releasesRepo = uri("https://s01.oss.sonatype.org/content/repositories/releases")
-            val snapshotsRepo = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepo else releasesRepo
-
-            credentials {
-                username = project.findProperty("publishUsername").toString()
-                password = project.findProperty("publishPassword").toString()
-            }
-        }
-    }
-}
-
-dependencies {
+mainDependencies {
     // Transitive dependencies
     api("us.ihmc:javacpp:1.5.11-ihmc-2") {
         isTransitive = true
@@ -50,25 +30,18 @@ dependencies {
     api("us.ihmc:ihmc-native-library-loader:2.0.4") {
         isTransitive = true
     }
-
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-
-    // OpenCV for demos
-    val openblasVersion = "0.3.28-1.5.11-ihmc-2"
-    testImplementation("us.ihmc:openblas:$openblasVersion")
-    testImplementation("us.ihmc:openblas:$openblasVersion:linux-x86_64")
-    testImplementation("us.ihmc:openblas:$openblasVersion:linux-arm64")
-    testImplementation("us.ihmc:openblas:$openblasVersion:windows-x86_64")
-    val opencvVersion = "4.10.0-1.5.11-ihmc-2"
-    testImplementation("us.ihmc:opencv:$opencvVersion")
-    testImplementation("us.ihmc:opencv:$opencvVersion:linux-arm64")
-    testImplementation("us.ihmc:opencv:$opencvVersion:linux-x86_64")
-    testImplementation("us.ihmc:opencv:$opencvVersion:linux-x86_64-gpu")
-    testImplementation("us.ihmc:opencv:$opencvVersion:windows-x86_64")
-    testImplementation("us.ihmc:opencv:$opencvVersion:windows-x86_64-gpu")
 }
 
-tasks.test {
-    useJUnitPlatform()
+testDependencies {
+   // OpenCV for demos
+   val openblasVersion = "0.3.28-1.5.11-ihmc-2"
+   implementation("us.ihmc:openblas:$openblasVersion")
+   implementation("us.ihmc:openblas:$openblasVersion:linux-x86_64")
+   implementation("us.ihmc:openblas:$openblasVersion:linux-arm64")
+   implementation("us.ihmc:openblas:$openblasVersion:windows-x86_64")
+   val opencvVersion = "4.10.0-1.5.11-ihmc-2"
+   implementation("us.ihmc:opencv:$opencvVersion")
+   implementation("us.ihmc:opencv:$opencvVersion:linux-arm64")
+   implementation("us.ihmc:opencv:$opencvVersion:linux-x86_64")
+   implementation("us.ihmc:opencv:$opencvVersion:windows-x86_64")
 }
