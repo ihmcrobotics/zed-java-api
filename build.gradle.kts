@@ -20,28 +20,27 @@ tasks.javadoc {
 }
 
 mainDependencies {
-    // Transitive dependencies
-    api("us.ihmc:javacpp:1.5.11-ihmc-2") {
-        isTransitive = true
-    }
-    api("us.ihmc:cuda:12.6-9.5-1.5.11-ihmc-2") {
-        isTransitive = true
-    }
-    api("us.ihmc:ihmc-native-library-loader:2.0.4") {
-        isTransitive = true
-    }
+   // Transitive dependencies
+   api("org.bytedeco:javacpp:1.5.11") {
+      isTransitive = true
+   }
+   api("org.bytedeco:cuda:12.6-9.5-1.5.11") {
+      isTransitive = true
+   }
+   api("us.ihmc:ihmc-native-library-loader:2.0.4") {
+      isTransitive = true
+   }
 }
 
 testDependencies {
-   // OpenCV for demos
-   val openblasVersion = "0.3.28-1.5.11-ihmc-2"
-   implementation("us.ihmc:openblas:$openblasVersion")
-   implementation("us.ihmc:openblas:$openblasVersion:linux-x86_64")
-   implementation("us.ihmc:openblas:$openblasVersion:linux-arm64")
-   implementation("us.ihmc:openblas:$openblasVersion:windows-x86_64")
-   val opencvVersion = "4.10.0-1.5.11-ihmc-2"
-   implementation("us.ihmc:opencv:$opencvVersion")
-   implementation("us.ihmc:opencv:$opencvVersion:linux-arm64")
-   implementation("us.ihmc:opencv:$opencvVersion:linux-x86_64")
-   implementation("us.ihmc:opencv:$opencvVersion:windows-x86_64")
+   val openblasVersion = "0.3.28-1.5.11"
+   api("org.bytedeco:openblas:$openblasVersion")
+   api("org.bytedeco:openblas:$openblasVersion:linux-x86_64")
+   api("org.bytedeco:openblas:$openblasVersion:linux-arm64")
+   api("org.bytedeco:openblas:$openblasVersion:windows-x86_64")
+   val opencvVersion = "4.10.0-1.5.11-20251001-ihmc" // Hosted on https://robotlabfiles.ihmc.us/repository
+   api("us.ihmc:opencv:$opencvVersion")
+   api("us.ihmc:opencv:$opencvVersion:linux-arm64-gpu")
+   api("us.ihmc:opencv:$opencvVersion:linux-x86_64-gpu")
+   api("us.ihmc:opencv:$opencvVersion:windows-x86_64-gpu")
 }
