@@ -16,7 +16,7 @@ Requires Java 17.
 ### Gradle
 ```
 dependencies {
-  implementation("us.ihmc:zed-java-api:5.0.0")
+  implementation("us.ihmc:zed-java-api:5.0.0_1")
 }
 ```
 ### Maven
@@ -25,7 +25,7 @@ dependencies {
   <dependency>
     <groupId>us.ihmc</groupId>
     <artifactId>zed-java-api</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.0_1</version>
   </dependency>
 </dependencies>
 ```
