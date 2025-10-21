@@ -3964,33 +3964,33 @@ public static final int
 			float scalefactor, @ByVal SL_Vector3 mean, @ByVal SL_Vector3 stddev, @Cast("bool") boolean keep_aspect_ratio, @Cast("bool") boolean swap_RB_channels,
 	        Pointer stream);
 
-    ///**
-    //\brief Check if the camera is a ZED One (Monocular) or ZED (Stereo)
-    //\param m : Camera model
-    //*/
-    //INTERFACE_API bool sl_is_camera_one(enum SL_MODEL m);
+    /**
+    \brief Check if the camera is a ZED One (Monocular) or ZED (Stereo)
+    @param m : Camera model
+    */
+    public static native @Cast("bool") boolean sl_is_camera_one(@Cast("SL_MODEL") int m);
 
-    ///**
-    //\brief Check if a resolution is available for a given camera model
-    //\param r : Resolution to check
-    //\param m : Camera model
-    //*/
-    //INTERFACE_API bool sl_is_resolution_available(enum SL_RESOLUTION r, enum SL_MODEL m);
+    /**
+    \brief Check if a resolution is available for a given camera model
+    @param r : Resolution to check
+    @param m : Camera model
+    */
+    public static native @Cast("bool") boolean sl_is_resolution_available(@Cast("SL_RESOLUTION") int r, @Cast("SL_MODEL") int m);
 
-    ///**
-    //\brief Check if a frame rate is available for a given resolution and camera model
-    //\param fps : Frame rate to check
-    //\param r : Resolution to check
-    //\param m : Camera model
-    //*/
-    //INTERFACE_API bool sl_is_FPS_available(int fps, enum SL_RESOLUTION r, enum SL_MODEL m);
+    /**
+    \brief Check if a frame rate is available for a given resolution and camera model
+    @param fps : Frame rate to check
+    @param r : Resolution to check
+    @param m : Camera model
+    */
+    public static native @Cast("bool") boolean sl_is_FPS_available(int fps, @Cast("SL_RESOLUTION") int r, @Cast("SL_MODEL") int m);
 
-    ///**
-    //\brief Check if a resolution for a given camera model is available for HDR
-    //\param r : Resolution to check
-    //\param m : Camera model
-    //*/
-    //INTERFACE_API bool sl_is_HDR_available(enum SL_RESOLUTION r, enum SL_MODEL m);
+    /**
+    \brief Check if a resolution for a given camera model is available for HDR
+    @param r : Resolution to check
+    @param m : Camera model
+    */
+    public static native @Cast("bool") boolean sl_is_HDR_available(@Cast("SL_RESOLUTION") int r, @Cast("SL_MODEL") int m);
 
 
 // #ifdef __cplusplus

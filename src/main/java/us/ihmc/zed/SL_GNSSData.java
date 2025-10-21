@@ -79,4 +79,14 @@ public class SL_GNSSData extends Pointer {
 	 *
 	 */
 	public native double altitude_std(); public native SL_GNSSData altitude_std(double setter);
+	/**
+	* \brief GNSS status of the data.
+	*
+	*/
+	public native @Cast("SL_GNSS_STATUS") int gnss_status(); public native SL_GNSSData gnss_status(int setter);
+	/**
+	* \brief GNSS mode of the data.
+	*
+	*/
+	public native @Cast("SL_GNSS_MODE") int gnss_mode(); public native SL_GNSSData gnss_mode(int setter);
 }
