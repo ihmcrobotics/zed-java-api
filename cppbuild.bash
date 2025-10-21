@@ -5,7 +5,7 @@ mkdir cppbuild
 cd cppbuild
 
 if [ ! -f "main.tar.gz" ]; then
-  curl -L -o main.tar.gz https://github.com/stereolabs/zed-c-api/archive/refs/heads/main.tar.gz
+  curl -L -o main.tar.gz https://github.com/TomaszTB/zed-c-api/archive/refs/heads/copy-all-init-parameters.tar.gz
 fi
 
 tar -xvf main.tar.gz
