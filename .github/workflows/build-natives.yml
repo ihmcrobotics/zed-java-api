@@ -84,7 +84,7 @@ jobs:
         if: ${{ always() }}
         run: rm -rf /work/*
   build-windows:
-    runs-on: [windows-2019]
+    runs-on: [windows-2022]
     needs: [build-linux-l4t]
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +104,7 @@ jobs:
           tar -xvf ZEDSDK-Windows-5.0.2.tar.gz -C "C:\\Program Files (x86)"
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          vsversion: 2019
+          vsversion: 2022
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
