@@ -10,9 +10,9 @@ fi
 
 tar -xvf main.tar.gz
 
-cp ../patches/CMakeLists.txt.zed_c_api.patch zed-c-api-main/CMakeLists.txt.zed_c_api.patch
+cp ../patches/CMakeLists.txt.zed_c_api.patch zed-c-api-copy-all-init-parameters/CMakeLists.txt.zed_c_api.patch
 
-cd zed-c-api-main
+cd zed-c-api-copy-all-init-parameters
 
 patch CMakeLists.txt CMakeLists.txt.zed_c_api.patch
 
