@@ -15,12 +15,26 @@ Supported platforms:
 Requires Java 17.
 ### Gradle
 ```
+repositories {
+    [...]
+    maven {
+        url = uri("https://robotlabfiles.ihmc.us/repository/")
+    }
+}
+
 dependencies {
   implementation("us.ihmc:zed-java-api:5.0.0_1")
 }
 ```
 ### Maven
 ```
+<repositories>
+  <repository>
+    <id>ihmc-repo</id>
+    <url>https://robotlabfiles.ihmc.us/repository/</url>
+  </repository>
+</repositories>
+
 <dependencies>
   <dependency>
     <groupId>us.ihmc</groupId>
