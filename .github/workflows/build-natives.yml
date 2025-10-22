@@ -26,14 +26,14 @@ jobs:
       - name: Compile native library (x86_64)
         run: |
           bash cppbuild.bash
-      - name: Commit generated java and native libraries
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: '*.java *.so' # Only commit generated java from Linux
-          author_name: ihmc-rosie
-          author_email: rosie@ihmc.us
-          message: 'Rebuild natives for Linux (x86_64)'
-          push: true
+      # - name: Commit generated java and native libraries
+      #   uses: EndBug/add-and-commit@v9
+      #   with:
+      #     add: '*.java *.so' # Only commit generated java from Linux
+      #     author_name: ihmc-rosie
+      #     author_email: rosie@ihmc.us
+      #     message: 'Rebuild natives for Linux (x86_64)'
+      #     push: true
   build-linux-l4t:
     runs-on: [ubuntu-22.04-arm]
     container:
