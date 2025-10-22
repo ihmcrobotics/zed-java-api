@@ -38,7 +38,6 @@ jobs:
     runs-on: [ubuntu-22.04-arm]
     container:
       image: stereolabs/zed:5.0-devel-l4t-r35.3
-      options: --platform 'linux/arm64'
     needs: [build-linux-x86_64]
     steps:
       - name: Install dependencies
