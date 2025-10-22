@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build-linux-x86_64:
-    runs-on: [self-hosted, ihmc-runner-nvidia]
+    runs-on: [ubuntu-22.04]
     container:
       image: stereolabs/zed:5.0-devel-cuda12.8-ubuntu20.04
     steps:
@@ -35,7 +35,7 @@ jobs:
           message: 'Rebuild natives for Linux (x86_64)'
           push: true
   build-linux-l4t:
-    runs-on: [self-hosted, ihmc-runner-nvidia]
+    runs-on: [ubuntu-22.04-arm]
     container:
       image: stereolabs/zed:5.0-devel-l4t-r35.3
       options: --platform 'linux/arm64'
