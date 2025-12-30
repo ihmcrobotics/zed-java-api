@@ -33,11 +33,20 @@ public class SL_Landmark2D extends Pointer {
     }
 
 	/**
-	 \brief Unique identifier for the landmark.
+	\brief Unique identifier for the landmark.
 	 */
 	public native @Cast("uint64_t") long id(); public native SL_Landmark2D id(long setter);
+
 	/**
-	 \brief  Projection of the landmark in the image.
-	 */
+	\brief  Projection of the landmark in the image.
+	*/
 	public native @ByRef SL_Uint2 image_position(); public native SL_Landmark2D image_position(SL_Uint2 setter);
+	
+	/**
+	\brief Confidence score indicating the likelihood that the landmark is associated with a dynamic object.
+	<p>
+	The value ranges from 0 to 1, where a smaller value indicates greater confidence that the landmark
+	is owned by a dynamic object.
+	*/
+	public native float dynamic_confidence(); public native SL_Landmark2D dynamic_confidence(float setter);
 }

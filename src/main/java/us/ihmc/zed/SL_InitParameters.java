@@ -212,7 +212,7 @@ public class SL_InitParameters extends Pointer {
 	This parameter allows you to enable the verbosity of the ZED SDK to get a variety of runtime information in the console.
 	\n When developing an application, enabling verbose (<code>\ref sdk_verbose >= 1</code>) mode can help you understand the current ZED SDK behavior.
 	\n However, this might not be desirable in a shipped version.
-	\n Default: 0 (no verbose message)
+	\n Default: 1 (verbose messages enabled)
 	\note The verbose messages can also be exported into a log file.
 	 */
 	public native int sdk_verbose(); public native SL_InitParameters sdk_verbose(int setter);

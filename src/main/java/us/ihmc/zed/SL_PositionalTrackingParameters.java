@@ -116,4 +116,14 @@ public class SL_PositionalTrackingParameters extends Pointer {
 	\n Default: \ref SL_POSITIONAL_TRACKING_MODE_GEN_1
 	*/
 	public native @Cast("SL_POSITIONAL_TRACKING_MODE") int mode(); public native SL_PositionalTrackingParameters mode(int setter);
+
+	/**
+	 * \brief Whether to enable the area mode in localize only mode.
+	 */
+	public native @Cast("bool") boolean enable_localization_only(); public native SL_PositionalTrackingParameters enable_localization_only(boolean setter);
+
+	/**
+	 * \brief Whether to enable the 2D ground mode.
+	 */
+	public native @Cast("bool") boolean enable_2d_ground_mode(); public native SL_PositionalTrackingParameters enable_2d_ground_mode(boolean setter);
 }

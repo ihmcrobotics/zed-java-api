@@ -78,16 +78,19 @@ public class SL_DeviceProperties extends Pointer {
 	/**
 	\brief badge name (zedx_ar0234)
 	 */
-	public native @Cast("char*") BytePointer camera_badge(); public native SL_DeviceProperties camera_badge(BytePointer setter);
+	public native @Cast("char") byte camera_badge(int i); public native SL_DeviceProperties camera_badge(int i, byte setter);
+	@MemberGetter public native @Cast("char*") BytePointer camera_badge();
 
 	/**
 	\brief Name of sensor (zedx)
 	 */
-	public native @Cast("char*") BytePointer camera_sensor_model(); public native SL_DeviceProperties camera_sensor_model(BytePointer setter);
+	public native @Cast("char") byte camera_sensor_model(int i); public native SL_DeviceProperties camera_sensor_model(int i, byte setter);
+	@MemberGetter public native @Cast("char*") BytePointer camera_sensor_model();
 	/**
 	\brief Name of Camera in DT (ZED_CAM1)
 	 */
-	public native @Cast("char*") BytePointer camera_name(); public native SL_DeviceProperties camera_name(BytePointer setter);
+	public native @Cast("char") byte camera_name(int i); public native SL_DeviceProperties camera_name(int i, byte setter);
+	@MemberGetter public native @Cast("char*") BytePointer camera_name();
 	/**
 	\brief Input type of the camera.
 	 */
