@@ -36,8 +36,8 @@ popd
 cd cppbuild
 cp -r ../src/main/java/* .
 
-JAVACPP_VERSION=1.5.10
-JAVACPP_CUDA_VERSION=12.3-8.9-1.5.10
+JAVACPP_VERSION=1.5.11
+JAVACPP_CUDA_VERSION=12.6-9.5-1.5.11
 if [ ! -f javacpp.jar ]; then
   curl -L https://github.com/bytedeco/javacpp/releases/download/$JAVACPP_VERSION/javacpp-platform-$JAVACPP_VERSION-bin.zip -o javacpp-platform-$JAVACPP_VERSION-bin.zip
   unzip -j javacpp-platform-$JAVACPP_VERSION-bin.zip

@@ -12,13 +12,16 @@ jobs:
   build-linux-x86_64:
     runs-on: [ubuntu-22.04]
     container:
-      image: stereolabs/zed:5.0-devel-cuda12.8-ubuntu20.04
+      image: stereolabs/zed:5.1-devel-cuda12.8-ubuntu22.04
     steps:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install git wget curl build-essential libusb-dev -y
-      - uses: actions/checkout@v4
+          apt-get install git wget curl build-essential -y
+      - uses: actions/checkout@v6
+      - name: Mark workspace as safe
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -37,13 +40,13 @@ jobs:
   build-linux-l4t:
     runs-on: [ubuntu-22.04-arm]
     container:
-      image: stereolabs/zed:5.0-devel-l4t-r35.3
+      image: stereolabs/zed:5.1-devel-l4t-r35.4
     needs: [build-linux-x86_64]
     steps:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install git wget curl build-essential libusb-dev openjdk-17-jdk -y
+          apt-get install git wget curl build-essential openjdk-17-jdk -y
 # Cannot use for now, see https://github.com/actions/setup-node/issues/922
 #      - uses: actions/checkout@v4
       - name: Checkout
@@ -87,21 +90,21 @@ jobs:
     runs-on: [windows-2022]
     needs: [build-linux-l4t]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Pull repo
         run: |
           git reset --hard
           git pull
-      - uses: Jimver/cuda-toolkit@v0.2.15
+      - uses: Jimver/cuda-toolkit@v0.2.30
         id: cuda-toolkit
         with:
-          cuda: '11.8.0'
+          cuda: '12.8.0'
           method: 'network'
       - name: Install dependencies
         run: |
           python -m pip install gdown
-          gdown https://drive.google.com/uc?id=1yFqOcx3FotWFV4evgbXAvM4azFyfhzW1
-          tar -xvf ZEDSDK-Windows-5.0.2.tar.gz -C "C:\\Program Files (x86)"
+          gdown https://drive.google.com/uc?id=1s0Pec1WOa10ZU6yaIG0xdH45VcTF24M1
+          tar -xvf ZEDSDK-Windows-5.1.2.tar.gz -C "C:\\Program Files (x86)"
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           vsversion: 2022
