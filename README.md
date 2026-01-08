@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-  implementation("us.ihmc:zed-java-api:5.0.0_2")
+  implementation("us.ihmc:zed-java-api:5.1.0")
 }
 ```
 ### Maven
@@ -39,7 +39,7 @@ dependencies {
   <dependency>
     <groupId>us.ihmc</groupId>
     <artifactId>zed-java-api</artifactId>
-    <version>5.0.0_2</version>
+    <version>5.1.0</version>
   </dependency>
 </dependencies>
 ```
