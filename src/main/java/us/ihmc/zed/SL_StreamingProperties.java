@@ -65,4 +65,11 @@ public class SL_StreamingProperties extends Pointer {
 	Default: \ref SL_STREAMING_CODEC_H265
 	 */
 	public native @Cast("SL_STREAMING_CODEC") int codec(); public native SL_StreamingProperties codec(int setter);
+
+	/**
+	\brief Model of the streaming device.
+	<p>
+	Default: SL_MODEL_LAST
+	 */
+	public native @Cast("SL_MODEL") int camera_model(); public native SL_StreamingProperties camera_model(int setter);
 }

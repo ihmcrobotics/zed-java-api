@@ -118,13 +118,15 @@ public static final int
  */
 /** enum SL_ERROR_CODE */
 public static final int
+    /** The sensor's configuration (mode, multicast, etc.) was changed externally while streaming. If auto_recovery_on_config_change is enabled, the SDK will automatically reconnect. This warning code is returned once after successful recovery.*/
+    SL_ERROR_CODE_SENSOR_CONFIGURATION_CHANGED = -6,
     /** The camera has a potential calibration issue*/
     SL_ERROR_CODE_POTENTIAL_CALIBRATION_ISSUE = -5,
 	/** The operation could not proceed with the target configuration but did success with a fallback.*/
 	SL_ERROR_CODE_CONFIGURATION_FALLBACK = -4,
 	/** The input data does not contains the high frequency sensors data, this is usually because it requires newer SVO/Streaming. In order to work this modules needs inertial data present in it input.*/
 	SL_ERROR_CODE_SENSORS_DATA_REQUIRED = -3,
-	/** The image could be corrupted, Enabled with the parameter InitParameters::enable_image_validity_check.*/
+	/** The image is corrupted with invalid colors (green/purple images). This indicates a serious hardware or driver issue.*/
 	SL_ERROR_CODE_CORRUPTED_FRAME = -2,
 	/** The camera is currently rebooting.*/
 	SL_ERROR_CODE_CAMERA_REBOOTING = -1,
@@ -317,6 +319,18 @@ public static final int
 	SL_MEM_GPU = 1,
 	/** Data will be stored on both the CPU and GPU. */
 	SL_MEM_BOTH = 2;
+
+/**
+\brief Lists available LIVE input type in the ZED SDK.
+ */
+/** enum SL_BUS_TYPE */
+public static final int
+	/** USB input mode */
+	SL_BUS_TYPE_USB = 0,
+	/** GMSL input mode \note Only on NVIDIA Jetson. */
+	SL_BUS_TYPE_GMSL = 1,
+	/** Automatically select the input type.\n Trying first for available USB cameras, then GMSL. */
+	SL_BUS_TYPE_AUTO = 2;
 
 /**
 \brief Lists available sensor types.
@@ -1018,6 +1032,9 @@ public static final int
 	SL_OBJECT_ACCELERATION_PRESET_MEDIUM = 2,
 	/** Suitable for objects with high maximum acceleration (e.g., a car accelerating, a kicked sports ball). */
 	SL_OBJECT_ACCELERATION_PRESET_HIGH = 3;
+// Targeting ../SL_ObjectTrackingParameters.java
+
+
 
 /**
   * \brief Report the actual inference precision used
@@ -1757,15 +1774,68 @@ public static final int
     @param path_svo : Filename of the svo to read (for SVO input).
     @param ip : IP of the camera to open (for Stream input).
     @param stream_port : Port of the camera to open (for Stream input).
+    @param gmsl_port : GMSL port number for camera selection (only used when input_type is GMSL). Default: -1 (do nothing).
+	@param bus_type : Whether the camera is a USB or a GMSL camera (when opening with camera ID).
     @param output_file : ZED SDK verbose log file. Redirect the SDK verbose message to the file.
     @param opt_settings_path[optional] : Settings path.
     @param opencv_calib_path[optional] : openCV calibration file.
+    
     @return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
     */
-    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  @Cast("const char*") BytePointer path_svo, @Cast("const char*") BytePointer ip, int stream_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
-    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  String path_svo, String ip, int stream_port, String output_file, String opt_settings_path, String opencv_calib_path);
+    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  @Cast("const char*") BytePointer path_svo, @Cast("const char*") BytePointer ip, int stream_port, int gmsl_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  String path_svo, String ip, int stream_port, int gmsl_port, String output_file, String opt_settings_path, String opencv_calib_path);
 
+    /**
+	\brief Opens the ZED camera from the provided SL_InitParameters using its  camera ID.
+	@param camera_id : Id of the camera to open.
+	@param init_parameters : A structure containing all the initial parameters. Default: a preset of SL_InitParameters.
+	@param output_file : ZED SDK verbose log file. Redirect the SDK verbose message to the file.
+	@param opt_settings_path[optional] : Settings path.
+	@param opencv_calib_path[optional] : openCV calibration file.
+	@return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
+    */
+    public static native int sl_open_camera_from_camera_id(int camera_id, SL_InitParameters init_parameters, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+    public static native int sl_open_camera_from_camera_id(int camera_id, SL_InitParameters init_parameters, String output_file, String opt_settings_path, String opencv_calib_path);
 
+    /**
+	\brief Opens the ZED camera from the provided SL_InitParameters using its serial number.
+	@param camera_id : Id of the camera to open.
+	@param init_parameters : A structure containing all the initial parameters. Default: a preset of SL_InitParameters.
+	@param serial_number : Serial number of the camera to open.
+	@param output_file : ZED SDK verbose log file. Redirect the SDK verbose message to the file.
+	@param opt_settings_path[optional] : Settings path.
+	@param opencv_calib_path[optional] : openCV calibration file.
+	@return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
+    */
+	public static native int sl_open_camera_from_serial_number(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+	public static native int sl_open_camera_from_serial_number(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number, String output_file, String opt_settings_path, String opencv_calib_path);
+
+    /**
+	\brief Opens the ZED camera from the provided SL_InitParameters using an SVO file.
+	@param camera_id : Id of the camera to open.
+	@param init_parameters : A structure containing all the initial parameters. Default: a preset of SL_InitParameters.
+	@param path_svo : Filename of the svo to read (for SVO input).
+	@param output_file : ZED SDK verbose log file. Redirect the SDK verbose message to the file.
+	@param opt_settings_path[optional] : Settings path.
+	@param opencv_calib_path[optional] : openCV calibration file.
+	@return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
+    */
+	public static native int sl_open_camera_from_svo_file(int camera_id, SL_InitParameters init_parameters, @Cast("const char*") BytePointer path_svo, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+	public static native int sl_open_camera_from_svo_file(int camera_id, SL_InitParameters init_parameters, String path_svo, String output_file, String opt_settings_path, String opencv_calib_path);
+
+    /**
+	\brief Opens the ZED camera from the provided SL_InitParameters using its IP and stream port.
+	@param camera_id : Id of the camera to open.
+	@param init_parameters : A structure containing all the initial parameters. Default: a preset of SL_InitParameters.
+	@param ip : IP of the camera to open (for Stream input).
+	@param stream_port : Port of the camera to open (for Stream input).
+	@param output_file : ZED SDK verbose log file. Redirect the SDK verbose message to the file.
+	@param opt_settings_path[optional] : Settings path.
+	@param opencv_calib_path[optional] : openCV calibration file.
+	@return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
+    */
+	public static native int sl_open_camera_from_stream(int camera_id, SL_InitParameters init_parameters, @Cast("const char*") BytePointer ip, int stream_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+	public static native int sl_open_camera_from_stream(int camera_id, SL_InitParameters init_parameters, String ip, int stream_port, String output_file, String opt_settings_path, String opencv_calib_path);
     /**
     \brief Set this camera as a data provider for the Fusion module.
     <p>
@@ -2088,12 +2158,13 @@ public static final int
     /**
     \brief Sets the playback cursor to the desired frame number in the SVO file.
     <p>
-    This function allows you to move around within a played-back SVO file. After calling, the next call to sl_grab() will read the provided frame number.
+    This function allows you to move around within a played-back SVO file. After calling, the next call to sl_grab() will read the provided position.
     <p>
     @param camera_id : Id of the camera instance.
-    @param frame_number : The number of the desired frame to be decoded.
+    @param position : The position of the desired frame to be decoded.
+    @return \ref SL_ERROR_CODE to indicate if the method was successful.
      */
-    public static native void sl_set_svo_position(int camera_id, int frame_number);
+    public static native @Cast("SL_ERROR_CODE") int sl_set_svo_position(int camera_id, int _position);
 
     /**
     \brief Pauses or resumes SVO reading

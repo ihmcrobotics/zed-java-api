@@ -59,4 +59,18 @@ public class SL_ObjectDetectionRuntimeParameters extends Pointer {
 	 */
 	public native int object_confidence_threshold(int i); public native SL_ObjectDetectionRuntimeParameters object_confidence_threshold(int i, int setter);
 	@MemberGetter public native IntPointer object_confidence_threshold();
+
+	/**
+	\brief Default tracking parameters applied to all object classes.
+	\note These parameters are used as fallback when \ref object_class_tracking_parameters is not set for a specific class.
+	 */
+	public native @ByRef SL_ObjectTrackingParameters object_tracking_parameters(); public native SL_ObjectDetectionRuntimeParameters object_tracking_parameters(SL_ObjectTrackingParameters setter);
+
+	/**
+	\brief Per-class tracking parameters array.
+	Allows setting different tracking parameters for each object class.
+	\note Use \ref object_tracking_parameters as fallback for classes not explicitly set.
+	 */
+	public native @ByRef SL_ObjectTrackingParameters object_class_tracking_parameters(int i); public native SL_ObjectDetectionRuntimeParameters object_class_tracking_parameters(int i, SL_ObjectTrackingParameters setter);
+	@MemberGetter public native SL_ObjectTrackingParameters object_class_tracking_parameters();
 }

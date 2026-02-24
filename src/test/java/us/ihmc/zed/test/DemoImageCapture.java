@@ -61,7 +61,7 @@ public class DemoImageCapture {
         init_param.enable_image_validity_check(false);
 
         // Open the camera
-        int state = sl_open_camera(camera_id, init_param, 0, "", "", 0, "", "", "");
+        int state = sl_open_camera(camera_id, init_param, 0, "", "", 0, 0, "", "", "");
 
         if (state != 0) {
             throw new RuntimeException("Could not initialize ZED");

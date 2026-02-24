@@ -4,15 +4,15 @@ pushd .
 mkdir cppbuild
 cd cppbuild
 
-if [ ! -f "main.tar.gz" ]; then
-  curl -L -o main.tar.gz https://github.com/stereolabs/zed-c-api/archive/refs/heads/main.tar.gz
+if [ ! -f "zed-c-api-5.2.tar.gz" ]; then
+  curl -L -o zed-c-api-5.2.tar.gz https://codeload.github.com/stereolabs/zed-c-api/tar.gz/refs/tags/v5.2
 fi
 
-tar -xvf main.tar.gz
+tar -xvf zed-c-api-5.2.tar.gz
 
-cp ../patches/CMakeLists.txt.zed_c_api.patch zed-c-api-main/CMakeLists.txt.zed_c_api.patch
+cp ../patches/CMakeLists.txt.zed_c_api.patch zed-c-api-5.2/CMakeLists.txt.zed_c_api.patch
 
-cd zed-c-api-main
+cd zed-c-api-5.2
 
 patch CMakeLists.txt CMakeLists.txt.zed_c_api.patch
 

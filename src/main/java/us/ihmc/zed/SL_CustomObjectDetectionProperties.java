@@ -176,4 +176,9 @@ public class SL_CustomObjectDetectionProperties extends Pointer {
 	Defaults: NaN
 	*/
 	public native float max_allowed_acceleration(); public native SL_CustomObjectDetectionProperties max_allowed_acceleration(float setter);
+
+	/**
+	\brief Object tracking parameters for this class.
+	 */
+	public native @ByRef SL_ObjectTrackingParameters object_tracking_parameters(); public native SL_CustomObjectDetectionProperties object_tracking_parameters(SL_ObjectTrackingParameters setter);
 }

@@ -51,8 +51,13 @@ public class SL_DeviceProperties extends Pointer {
 	/**
 	\brief System path of the camera
 	 */
-	public native @Cast("unsigned char") byte path(int i); public native SL_DeviceProperties path(int i, byte setter);
-	@MemberGetter public native @Cast("unsigned char*") BytePointer path();
+	public native @Cast("char") byte path(int i); public native SL_DeviceProperties path(int i, byte setter);
+	@MemberGetter public native @Cast("char*") BytePointer path();
+	/**
+	\brief System path of the camera
+	 */
+	public native @Cast("char") byte video_device(int i); public native SL_DeviceProperties video_device(int i, byte setter);
+	@MemberGetter public native @Cast("char*") BytePointer video_device();
 	/**
 	\brief i2c port of the camera.
 	 */
@@ -70,6 +75,10 @@ public class SL_DeviceProperties extends Pointer {
 	 */
 
 	public native @Cast("unsigned int") int sn(); public native SL_DeviceProperties sn(int setter);
+	/**
+	 \brief GMSL port of the camera.
+	  */
+	public native int gmsl_port(); public native SL_DeviceProperties gmsl_port(int setter);
 	/**
 	\brief [Cam model, eeprom version, white balance param]
 	 */
