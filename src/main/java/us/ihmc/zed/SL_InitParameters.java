@@ -156,26 +156,28 @@ public class SL_InitParameters extends Pointer {
 	public native int depth_stabilization(); public native SL_InitParameters depth_stabilization(int setter);
 	
 	/**
-	\brief Minimum depth distance to be returned, measured in the \ref SL_UNIT defined in \ref coordinate_unit.
-	
-	This parameter allows you to specify the minimum depth value (from the camera) that will be computed.
-	
-	\n In stereovision (the depth technology used by the camera), looking for closer depth values can have a slight impact on performance and memory consumption.
-	\n On most modern GPUs, performance impact will be low. However, the impact of memory footprint will be visible.
-	\n In cases of limited computation power, increasing this value can provide better performance.
-	\n Default: -1 (corresponding values are available <a href="https://www.stereolabs.com/docs/depth-sensing/depth-settings#depth-range">here</a>)
+	\brief Minimum depth distance to be returned, measured in the SL_UNIT defined in \ref coordinate_unit.
+	\n This parameter allows you to specify the minimum depth value (from the camera) that will be computed.
+	\n Setting this value to any negative or null value will select the default minimum depth distance available for the used ZED Camera (depending on the camera focal length and baseline).
 	<p>
-	\note \ref depth_minimum_distance value cannot be greater than 3 meters.
-	\note 0 will imply that \ref depth_minimum_distance is set to the minimum depth possible for each camera
-	(those values are available <a href="https://www.stereolabs.com/docs/depth-sensing/depth-settings#depth-range">here</a>).
-		*/
+	\n Default: -1
+	<p>
+	\n When using deprecated depth modes ( \ref SL_DEPTH_MODE_PERFORMANCE, \ref SL_DEPTH_MODE_QUALITY or \ref SL_DEPTH_MODE_ULTRA), 
+	the default minimum depth distances are given by <a href="https://www.stereolabs.com/docs/depth-sensing/depth-settings#depth-range">this table</a>.
+	
+	\note This value cannot be greater than 3 meters.
+	 */
 	public native float depth_minimum_distance(); public native SL_InitParameters depth_minimum_distance(float setter);
+	
 	/**
 	\brief Maximum depth distance to be returned, measured in the \ref SL_UNIT defined in \ref coordinate_unit.
 	<p>
-	When estimating the depth, the ZED SDK uses this upper limit to turn higher values into <b>inf</b> ones.
-	\note Changing this value has no impact on performance and doesn't affect the positional tracking nor the spatial mapping.
-	\note It only change values the depth, point cloud and normals.
+	\n When estimating the depth, the ZED SDK uses this upper limit to turn higher values into sl::TOO_FAR ones.
+	\n Changing this value has no impact on performance and doesn't affect the positional tracking nor the spatial mapping.
+	\n It only change values the depth, point cloud and normals.
+	\n Setting this value to any negative or null value will select the default maximum depth distance available.
+	<p>
+	\n Default: -1
 	 */
 	public native float depth_maximum_distance(); public native SL_InitParameters depth_maximum_distance(float setter);
 	

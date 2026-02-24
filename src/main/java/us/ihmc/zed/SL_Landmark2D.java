@@ -47,6 +47,8 @@ public class SL_Landmark2D extends Pointer {
 	<p>
 	The value ranges from 0 to 1, where a smaller value indicates greater confidence that the landmark
 	is owned by a dynamic object.
+    <p>
+    The value is -1 if the dynamic confidence is not computed.
 	*/
 	public native float dynamic_confidence(); public native SL_Landmark2D dynamic_confidence(float setter);
 }

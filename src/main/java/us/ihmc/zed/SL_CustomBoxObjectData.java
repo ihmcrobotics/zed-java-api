@@ -138,4 +138,45 @@ public class SL_CustomBoxObjectData extends Pointer {
 	Defaults: NaN
 		*/
 	public native float max_allowed_acceleration(); public native SL_CustomBoxObjectData max_allowed_acceleration(float setter);
+
+	/**
+	\brief Control the smoothing of the velocity estimation.
+	Values between 0.0 and 1.0.
+	- High value (closer to 1.0): Very smooth, but may lag behind rapid changes.
+	- Low value (closer to 0.0): Very responsive to velocity changes, but may be jittery.
+	- 0.5: ZED SDK base tuning. Balanced smoothing and responsiveness.
+	A negative value (e.g. -1) lets the ZED SDK interpret the velocity_smoothing_factor.
+	Default: -1
+	*/
+	public native float velocity_smoothing_factor(); public native SL_CustomBoxObjectData velocity_smoothing_factor(float setter);
+
+	/**
+	\brief Threshold to force an object's velocity to zero.
+	If the calculated speed (m/s) is below this threshold, the object is considered static.
+	This helps eliminate drift on stationary objects.
+	A negative value (e.g. -1) lets the ZED SDK interpret the min_velocity_threshold.
+	Default: -1
+	*/
+	public native float min_velocity_threshold(); public native SL_CustomBoxObjectData min_velocity_threshold(float setter);
+
+	/**
+	\brief Duration to keep predicting a track's position after occlusion.
+	When an object is no longer visible (occluded or out of frame), 
+	the tracker will predict its position for this duration before deleting the track.
+	- Short (e.g., 0.2s): Prevents "ghost" objects but may break tracks during short occlusions.
+	- Long (e.g., 2.0s): Maintains ID during long occlusions but may report objects that are gone.
+	A negative value (e.g. -1) lets the ZED SDK interpret the prediction_timeout_s.
+	Default: -1
+	*/
+	public native float prediction_timeout_s(); public native SL_CustomBoxObjectData prediction_timeout_s(float setter);
+
+	/**
+	\brief Minimum confirmation time required to validate a track.
+	The minimum duration (in seconds) an object must be continuously detected
+	before it is reported as a valid track. Helps filter out spurious false
+	positives that appear only briefly.
+	A negative value (e.g. -1) lets the ZED SDK interpret the min_confirmation_time_s.
+	Default: -1
+	*/
+	public native float min_confirmation_time_s(); public native SL_CustomBoxObjectData min_confirmation_time_s(float setter);
 }
