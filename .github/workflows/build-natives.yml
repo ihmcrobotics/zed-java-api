@@ -9,39 +9,39 @@ permissions:
 # For the Linux builds, see https://www.stereolabs.com/docs/docker/building-arm-container-on-x86
 
 jobs:
-  build-linux-x86_64:
-    runs-on: [ubuntu-22.04]
-    container:
-      image: stereolabs/zed:5.3-devel-cuda12.8-ubuntu22.04
-    steps:
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install git wget curl build-essential -y
-      - uses: actions/checkout@v6
-      - name: Mark workspace as safe
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      - name: Compile native library (x86_64)
-        run: |
-          bash cppbuild.bash
-      - name: Commit generated java and native libraries
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: '*.java *.so' # Only commit generated java from Linux
-          author_name: ihmc-rosie
-          author_email: rosie@ihmc.us
-          message: 'Rebuild natives for Linux (x86_64)'
-          push: true
+#  build-linux-x86_64:
+#    runs-on: [ubuntu-22.04]
+#    container:
+#      image: stereolabs/zed:5.3-devel-cuda12.8-ubuntu22.04
+#    steps:
+#      - name: Install dependencies
+#        run: |
+#          apt-get update
+#          apt-get install git wget curl build-essential -y
+#      - uses: actions/checkout@v6
+#      - name: Mark workspace as safe
+#        run: |
+#          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+#      - uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#      - name: Compile native library (x86_64)
+#        run: |
+#          bash cppbuild.bash
+#      - name: Commit generated java and native libraries
+#        uses: EndBug/add-and-commit@v9
+#        with:
+#          add: '*.java *.so' # Only commit generated java from Linux
+#          author_name: ihmc-rosie
+#          author_email: rosie@ihmc.us
+#          message: 'Rebuild natives for Linux (x86_64)'
+#          push: true
   build-linux-l4t:
     runs-on: [ubuntu-22.04-arm]
     container:
       image: stereolabs/zed:5.3-devel-l4t-r36.4
-    needs: [build-linux-x86_64]
+#    needs: [build-linux-x86_64]
     steps:
       - name: Install dependencies
         run: |
@@ -63,6 +63,9 @@ jobs:
       - name: Compile native library (arm64)
         run: |
           cd /work/zed-java-api
+          export CMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$CMAKE_LIBRARY_PATH
+          # Force the linker to ignore the fact that the stub is just a placeholder
+          export CXXFLAGS="-Wl,--allow-shlib-undefined"
           LINUX_CROSS_COMPILE_ARM=1 bash cppbuild.bash
       - name: Commit generated java and native libraries
         run: |
