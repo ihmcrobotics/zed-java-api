@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class ZEDJavaAPINativeLibrary implements NativeLibraryDescription {
     private static final int ZED_SDK_COMPATIBILITY_MAJOR_VERSION = 5;
-    private static final int ZED_SDK_COMPATIBILITY_MINOR_VERSION = 2;
+    private static final int ZED_SDK_COMPATIBILITY_MINOR_VERSION = 3;
 
     @Override
     public String getPackage(OperatingSystem os, Architecture arch) {
