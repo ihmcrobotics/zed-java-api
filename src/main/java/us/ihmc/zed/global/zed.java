@@ -199,7 +199,9 @@ public static final int
 	/** The module needs a newer version of CUDA. */
 	SL_ERROR_CODE_MODULE_NOT_COMPATIBLE_WITH_CUDA_VERSION = 33,
 	/** The drivers initialization has failed. When using gmsl cameras, try restarting with sudo systemctl restart zed_x_daemon.service */
-	SL_ERROR_CODE_DRIVER_FAILURE = 34;
+	SL_ERROR_CODE_DRIVER_FAILURE = 34,
+	/** The camera configuration exceeds available PHY CSI bandwidth (GMSL). Reduce resolution/FPS or adjust hardware configuration. */
+	SL_ERROR_CODE_CAMERA_EXCEEDS_BANDWIDTH = 35;
 
 /**
 \brief Lists available resolutions.
@@ -227,8 +229,12 @@ public static final int
 	SL_RESOLUTION_SVGA = 7,
 	/** 672*376 (x2) \n Available FPS: 15, 30, 60, 100*/
 	SL_RESOLUTION_VGA = 8,
+	/** 960x768 (x2) \n Available FPS: 30 \n Only supported with ZED-X HDR lineup (One/Stereo) */
+	SL_RESOLUTION_XVGA = 9,
+	/** 640x512 (x2) \n Available FPS: 30 \n Only supported with ZED-X HDR lineup (One/Stereo) */
+	SL_RESOLUTION_TXGA = 10,
 	/** Select the resolution compatible with the camera: <ul><li>ZED X/X Mini: \ref SL_RESOLUTION_HD1200</li><li>other cameras: \ref SL_RESOLUTION_HD720</li></ul>*/
-	SL_RESOLUTION_AUTO = 9;
+	SL_RESOLUTION_AUTO = 11;
 
 /**
 \brief Lists available units for measures.
@@ -299,6 +305,8 @@ public static final int
 	SL_MODEL_ZED_X_HDR_MINI = 7,
 	/** ZED X HDR Wide camera model */
 	SL_MODEL_ZED_X_HDR_MAX = 8,
+	/** ZED X Nano (18mm baseline) camera model with dual global shutter AR0234 sensor */
+	SL_MODEL_ZED_X_NANO = 9,
 	/** Virtual ZED X generated from 2 ZED X One */
 	SL_MODEL_VIRTUAL_ZED_X = 11,
 	/** ZED X One with global shutter AR0234 sensor */
@@ -470,10 +478,57 @@ public static final int
 	SL_VIDEO_SETTINGS_EXPOSURE_COMPENSATION = 19,
 	/** Level of denoising applied on both left and right images.\n Affected value should be between 0 and 100.\n Default value is 50. \note Only available for ZED X/X Mini cameras.*/
 	SL_VIDEO_SETTINGS_DENOISING = 20,
-	SL_VIDEO_SETTINGS_SCENE_ILLUMINANCE = 21, /** Level of illuminance of the scene. \n Can be used to determine the level of light in the scene and adjust settings accordingly. \note Read-only control. \n Available for ZED-X/Xmini cameras. \n Value provided in [0.1x]Lux for ZED-X / ZED-X Mini / ZED-XOne GS and ZED-XOne UHD cameras.*/
-	SL_VIDEO_SETTINGS_LAST = 22;
+	/** Level of illuminance of the scene. \n Can be used to determine the level of light in the scene and adjust settings accordingly. \note Read-only control. \n Available for ZED-X/Xmini cameras. \n Value provided in [0.1x]Lux for ZED-X / ZED-X Mini / ZED-XOne GS and ZED-XOne UHD cameras.*/
+	SL_VIDEO_SETTINGS_SCENE_ILLUMINANCE = 21,
+	/** AE anti-banding mode. \n Affected value should be between 0 and 3. \n 0: OFF, 1: AUTO, 2: 50Hz, 3: 60Hz. \note Only available for ZED X/X Mini cameras.*/
+	SL_VIDEO_SETTINGS_AE_ANTIBANDING = 22,
+	SL_VIDEO_SETTINGS_LAST = 23;
 
 @MemberGetter public static native int SL_VIDEO_SETTINGS_VALUE_AUTO();
+
+/**
+\brief Lists the available encoding presets for SVO recording.
+ */
+/** enum SL_SVO_ENCODING_PRESET */
+public static final int
+	/** Encoder default. Maps to NVENC P4 / V4L2 default. */
+	SL_SVO_ENCODING_PRESET_DEFAULT = 0,
+	/** Fastest encoding, lowest quality. Maps to NVENC P1 / V4L2 ULTRAFAST. */
+	SL_SVO_ENCODING_PRESET_ULTRAFAST = 1,
+	/** Fast encoding. Maps to NVENC P2 / V4L2 FAST. */
+	SL_SVO_ENCODING_PRESET_FAST = 2,
+	/** Balanced speed/quality. Maps to NVENC P3 / V4L2 MEDIUM. */
+	SL_SVO_ENCODING_PRESET_MEDIUM = 3,
+	/** Slow encoding, higher quality. Maps to NVENC P5 / V4L2 SLOW. */
+	SL_SVO_ENCODING_PRESET_SLOW = 4,
+	SL_SVO_ENCODING_PRESET_LAST = 5;
+
+/**
+\brief Selects the clock source used for all timestamps produced by the ZED SDK.
+ */
+/** enum SL_TIMESTAMP_CLOCK */
+public static final int
+	/** Timestamps use the system (wall-clock) time. Timestamps represent nanoseconds since Unix epoch. \warning Affected by NTP/PTP adjustments. */
+	SL_TIMESTAMP_CLOCK_SYSTEM_CLOCK = 0,
+	/** Timestamps use a monotonic clock (CLOCK_MONOTONIC). Immune to system clock step adjustments. */
+	SL_TIMESTAMP_CLOCK_MONOTONIC_CLOCK = 1,
+	SL_TIMESTAMP_CLOCK_LAST = 2;
+
+/**
+\brief Controls how voxel size adapts with depth in sl_retrieve_voxel_measure.
+ */
+/** enum SL_VOXELIZATION_MODE */
+public static final int
+	/** No adaptation. voxel_size is used uniformly everywhere. */
+	SL_VOXELIZATION_MODE_FIXED = 0,
+	/** Quadratic growth matching stereo depth noise: Z??/(f??B). Voxels grow larger at distance. */
+	SL_VOXELIZATION_MODE_STEREO_UNCERTAINTY = 1,
+	/** Linear growth with depth Z. Suits sensors with linearly increasing noise (e.g. lidar, ToF). */
+	SL_VOXELIZATION_MODE_LINEAR = 2,
+	SL_VOXELIZATION_MODE_LAST = 3;
+// Targeting ../SL_VoxelMeasureParameters.java
+
+
 
 /**
 \brief Lists retrievable measures.
@@ -532,84 +587,88 @@ public static final int
 	SL_VIEW_LEFT_GRAY = 2,
 	/** Right gray image. Each pixel contains 1 unsigned char.\n Type: \ref SL_MAT_TYPE_U8_C1 */
 	SL_VIEW_RIGHT_GRAY = 3,
+	/** Left NV12 unrectified image. */
+	SL_VIEW_LEFT_NV12_UNRECTIFIED = 4,
+	/** Right NV12 unrectified image. */
+	SL_VIEW_RIGHT_NV12_UNRECTIFIED = 5,
 	/** Left BGRA unrectified image. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_LEFT_UNRECTIFIED = 4,
+	SL_VIEW_LEFT_UNRECTIFIED = 6,
 	/** Right BGRA unrectified image. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_RIGHT_UNRECTIFIED = 5,
+	SL_VIEW_RIGHT_UNRECTIFIED = 7,
 	/** Left gray unrectified image. Each pixel contains 1 unsigned char.\n Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_LEFT_UNRECTIFIED_GRAY = 6,
+	SL_VIEW_LEFT_UNRECTIFIED_GRAY = 8,
 	/** Right gray unrectified image. Each pixel contains 1 unsigned char.\n Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_RIGHT_UNRECTIFIED_GRAY = 7,
+	SL_VIEW_RIGHT_UNRECTIFIED_GRAY = 9,
 	/** Left and right image (the image width is therefore doubled). Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_SIDE_BY_SIDE = 8,
+	SL_VIEW_SIDE_BY_SIDE = 10,
 	/** Color rendering of the depth. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 \note Use \ref SL_MEASURE_DEPTH with \ref sl_retrieve_measure() to get depth values.*/
-	SL_VIEW_DEPTH = 9,
+	SL_VIEW_DEPTH = 11,
 	/** Color rendering of the depth confidence. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 \note Use \ref SL_MEASURE_CONFIDENCE with \ref sl_retrieve_measure() to get confidence values.*/
-	SL_VIEW_CONFIDENCE = 10,
+	SL_VIEW_CONFIDENCE = 12,
 	/** Color rendering of the normals. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 \note Use \ref SL_MEASURE_NORMALS with \ref sl_retrieve_measure() to get normal values.*/
-	SL_VIEW_NORMALS = 11,
+	SL_VIEW_NORMALS = 13,
 	/** Color rendering of the right depth mapped on right sensor. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 \note Use \ref SL_MEASURE_DEPTH_RIGHT with \ref sl_retrieve_measure() to get depth right values.*/
-	SL_VIEW_DEPTH_RIGHT = 12,
+	SL_VIEW_DEPTH_RIGHT = 14,
 	/** Color rendering of the normals mapped on right sensor. Each pixel contains 4 unsigned char (B, G, R, A).\n Type: \ref SL_MAT_TYPE_U8_C4 \note Use \ref SL_MEASURE_NORMALS_RIGHT with \ref sl_retrieve_measure() to get normal right values.*/
-	SL_VIEW_NORMALS_RIGHT = 13,
+	SL_VIEW_NORMALS_RIGHT = 15,
 	/** Alias of \ref SL_VIEW_LEFT.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_LEFT_BGRA = 14,
+	SL_VIEW_LEFT_BGRA = 16,
 	/** Left image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_LEFT_BGR = 15,
+	SL_VIEW_LEFT_BGR = 17,
 	/** Alias of \ref SL_VIEW_RIGHT.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_RIGHT_BGRA = 16,
+	SL_VIEW_RIGHT_BGRA = 18,
 	/** Right image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_RIGHT_BGR = 17,
+	SL_VIEW_RIGHT_BGR = 19,
 	/** Alias of \ref SL_VIEW_LEFT_UNRECTIFIED.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_LEFT_UNRECTIFIED_BGRA = 18,
+	SL_VIEW_LEFT_UNRECTIFIED_BGRA = 20,
 	/** Left unrectified image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_LEFT_UNRECTIFIED_BGR = 19,
+	SL_VIEW_LEFT_UNRECTIFIED_BGR = 21,
 	/** Alias of \ref SL_VIEW_RIGHT_UNRECTIFIED.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_RIGHT_UNRECTIFIED_BGRA = 20,
+	SL_VIEW_RIGHT_UNRECTIFIED_BGRA = 22,
 	/** Right unrectified image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_RIGHT_UNRECTIFIED_BGR = 21,
+	SL_VIEW_RIGHT_UNRECTIFIED_BGR = 23,
 	/** Alias of \ref SL_VIEW_SIDE_BY_SIDE.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_SIDE_BY_SIDE_BGRA = 22,
+	SL_VIEW_SIDE_BY_SIDE_BGRA = 24,
 	/** Side by side image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_SIDE_BY_SIDE_BGR = 23,
+	SL_VIEW_SIDE_BY_SIDE_BGR = 25,
 	/** Side by side image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_SIDE_BY_SIDE_GRAY = 24,
+	SL_VIEW_SIDE_BY_SIDE_GRAY = 26,
 	/** Alias of \ref VIEW "sl::VIEW::SIDE_BY_SIDE_UNRECTIFIED".\n Type: \ref MAT_TYPE "sl::MAT_TYPE::U8_C4" */
-	SL_VIEW_SIDE_BY_SIDE_UNRECTIFIED_BGRA = 25,
+	SL_VIEW_SIDE_BY_SIDE_UNRECTIFIED_BGRA = 27,
 	/** Side by side unrectified image in BGR pixel format: Type: \ref MAT_TYPE "sl::MAT_TYPE::U8_C3" */
-	SL_VIEW_SIDE_BY_SIDE_UNRECTIFIED_BGR = 26,
+	SL_VIEW_SIDE_BY_SIDE_UNRECTIFIED_BGR = 28,
 	/** Side by side unrectified image in gray scale: Type: \ref MAT_TYPE "sl::MAT_TYPE::U8_C1" */
-	SL_VIEW_SIDE_BY_SIDE_UNRECTIFIED_GRAY = 27,
+	SL_VIEW_SIDE_BY_SIDE_UNRECTIFIED_GRAY = 29,
 	/** Alias of \ref SL_VIEW_DEPTH.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_DEPTH_BGRA = 28,
+	SL_VIEW_DEPTH_BGRA = 30,
 	/** Depth image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_DEPTH_BGR = 29,
+	SL_VIEW_DEPTH_BGR = 31,
 	/** Depth image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_DEPTH_GRAY = 30,
+	SL_VIEW_DEPTH_GRAY = 32,
 	/** Alias of \ref SL_VIEW_CONFIDENCE.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_CONFIDENCE_BGRA = 31,
+	SL_VIEW_CONFIDENCE_BGRA = 33,
 	/** Confidence image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_CONFIDENCE_BGR = 32,
+	SL_VIEW_CONFIDENCE_BGR = 34,
 	/** Confidence image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_CONFIDENCE_GRAY = 33,
+	SL_VIEW_CONFIDENCE_GRAY = 35,
 	/** Alias of \ref SL_VIEW_NORMALS.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_NORMALS_BGRA = 34,
+	SL_VIEW_NORMALS_BGRA = 36,
 	/** Normal image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_NORMALS_BGR = 35,
+	SL_VIEW_NORMALS_BGR = 37,
 	/** Normal image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_NORMALS_GRAY = 36,
+	SL_VIEW_NORMALS_GRAY = 38,
 	/** Alias of \ref SL_VIEW_DEPTH_RIGHT.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_DEPTH_RIGHT_BGRA = 37,
+	SL_VIEW_DEPTH_RIGHT_BGRA = 39,
 	/** Depth right image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_DEPTH_RIGHT_BGR = 38,
+	SL_VIEW_DEPTH_RIGHT_BGR = 40,
 	/** Depth right image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_DEPTH_RIGHT_GRAY = 39,
+	SL_VIEW_DEPTH_RIGHT_GRAY = 41,
 	/** Alias of \ref SL_VIEW_NORMALS_RIGHT.\n Type: \ref SL_MAT_TYPE_U8_C4 */
-	SL_VIEW_NORMALS_RIGHT_BGRA = 40,
+	SL_VIEW_NORMALS_RIGHT_BGRA = 42,
 	/** Normal right image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
-	SL_VIEW_NORMALS_RIGHT_BGR = 41,
+	SL_VIEW_NORMALS_RIGHT_BGR = 43,
 	/** Normal right image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_NORMALS_RIGHT_GRAY = 42;
+	SL_VIEW_NORMALS_RIGHT_GRAY = 44;
 
 /**
 \brief Lists the different states of object tracking.
@@ -658,14 +717,24 @@ public static final int
  */
 /** enum SL_SPATIAL_MEMORY_STATUS */
 public static final int
-	/** The positional tracking module is operating normally. */
+	/** @deprecated This state is no longer in use for GEN_3. */
 	SL_MAP_TRACKING_STATUS_OK = 0,
-	/** The positional tracking module detected a loop and corrected its position. */
+	/** Found a loop closure, relocalized within the area map or corrected after a sudden localization loss. */
 	SL_MAP_TRACKING_STATUS_LOOP_CLOSED = 1,
-	/** The positional tracking module is searching for recognizable areas in the global map to relocate. */
+	/** @deprecated This state is no longer in use for GEN_3. */
 	SL_MAP_TRACKING_STATUS_SEARCHING = 2,
-	/** Spatial memory is disabled */
-	SL_MAP_TRACKING_STATUS_OFF = 3;
+	/** Spatial memory is disabled. */
+	SL_MAP_TRACKING_STATUS_OFF = 3,
+	/** Camera has not yet acquired enough memory or found its first loop closure. Keep moving the camera. */
+	SL_MAP_TRACKING_STATUS_INITIALIZING = 4,
+	/** Camera is localized within the loaded area map. */
+	SL_MAP_TRACKING_STATUS_KNOWN_MAP = 5,
+	/** Camera is mapping or getting out of area map bounds. */
+	SL_MAP_TRACKING_STATUS_MAP_UPDATE = 6,
+	/** Localization cannot operate anymore (camera obstructed or sudden jumps). */
+	SL_MAP_TRACKING_STATUS_LOST = 7,
+	/** Not enough memory to continue tracking. */
+	SL_MAP_TRACKING_STATUS_NOT_ENOUGH_MEMORY_FOR_TRACKING = 8;
 
 /**
 \brief Lists the mode of positional tracking that can be used.
@@ -1760,6 +1829,13 @@ public static final int
     public static native @Cast("bool") boolean sl_create_camera(int camera_id);
 
     /**
+    \brief Returns an opaque pointer to the ZEDController instance for the given camera.
+    @param camera_id : Id of the camera.
+    @return Pointer to the ZEDController, or nullptr if the camera has not been created yet.
+    */
+    public static native Pointer sl_get_camera_handle(int camera_id);
+
+    /**
     \brief Reports if the camera has been successfully opened.
     @param camera_id : Id of the camera.
     @return true if the ZED camera is already setup, otherwise false.
@@ -1782,8 +1858,10 @@ public static final int
     
     @return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
     */
-    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  @Cast("const char*") BytePointer path_svo, @Cast("const char*") BytePointer ip, int stream_port, int gmsl_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
-    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  String path_svo, String ip, int stream_port, int gmsl_port, String output_file, String opt_settings_path, String opencv_calib_path);
+    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  @Cast("const char*") BytePointer path_svo, @Cast("const char*") BytePointer ip, 
+            int stream_port, int gmsl_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+    public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  String path_svo, String ip, 
+            int stream_port, int gmsl_port, String output_file, String opt_settings_path, String opencv_calib_path);
 
     /**
 	\brief Opens the ZED camera from the provided SL_InitParameters using its  camera ID.
@@ -1807,8 +1885,10 @@ public static final int
 	@param opencv_calib_path[optional] : openCV calibration file.
 	@return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
     */
-	public static native int sl_open_camera_from_serial_number(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
-	public static native int sl_open_camera_from_serial_number(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number, String output_file, String opt_settings_path, String opencv_calib_path);
+	public static native int sl_open_camera_from_serial_number(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number, @Cast("const char*") BytePointer output_file, 
+	        @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+	public static native int sl_open_camera_from_serial_number(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number, String output_file, 
+	        String opt_settings_path, String opencv_calib_path);
 
     /**
 	\brief Opens the ZED camera from the provided SL_InitParameters using an SVO file.
@@ -2000,11 +2080,34 @@ public static final int
     @param bitrate : overrides default bitrate of the SVO file, in KBits/s. Only works if \ref SL_SVO_COMPRESSION_MODE is H264 or H265.
     @param target_fps : Defines the target framerate for the recording module.
     @param transcode : In case of streaming input, if set to false, it will avoid decoding/re-encoding and convert directly streaming input to a SVO file.
-               This saves a encoding session and can be especially useful on NVIDIA Geforce cards where the number of encoding session is limited.
+               This saves a encoding session and can be especially useful on NVIDIA Geforce cards where the number of encoding session is limited. @param encryption_key : An optional 256-bytes array to encrypt the SVO file. If the array is not
+    empty, the generated SVO file will be encrypted and will require the same key to be read.
+    @param encryption_key : Optional encryption key or passphrase to protect the SVO file.
+    @param encoding_preset : Encoding preset for the hardware encoder.
     @return An \ref SL_ERROR_CODE that defines if SVO file was successfully created and can be filled with images.
      */
-    public static native int sl_enable_recording(int camera_id, @Cast("const char*") BytePointer filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode);
-    public static native int sl_enable_recording(int camera_id, String filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode);
+    public static native int sl_enable_recording(int camera_id, @Cast("const char*") BytePointer filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode,
+            @Cast("unsigned char*") BytePointer encryption_key, @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset);
+    public static native int sl_enable_recording(int camera_id, String filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode,
+            @Cast("unsigned char*") ByteBuffer encryption_key, @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset);
+    public static native int sl_enable_recording(int camera_id, @Cast("const char*") BytePointer filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode,
+            @Cast("unsigned char*") byte[] encryption_key, @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset);
+    public static native int sl_enable_recording(int camera_id, String filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode,
+            @Cast("unsigned char*") BytePointer encryption_key, @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset);
+    public static native int sl_enable_recording(int camera_id, @Cast("const char*") BytePointer filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode,
+            @Cast("unsigned char*") ByteBuffer encryption_key, @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset);
+    public static native int sl_enable_recording(int camera_id, String filename, @Cast("SL_SVO_COMPRESSION_MODE") int compression_mode, @Cast("unsigned int") int bitrate, int target_fps, @Cast("bool") boolean transcode,
+            @Cast("unsigned char*") byte[] encryption_key, @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset);
+
+    /**
+    \brief Creates a file for recording the ZED's output, accepting the full \ref SL_RecordingParameters structure.
+    <p>
+    Supports all recording options including encryption and encoding preset (added in SDK 5.3.0).
+    @param camera_id : Id of the camera instance.
+    @param recording_parameters : A structure containing all the recording parameters.
+    @return An \ref SL_ERROR_CODE that defines if the SVO file was successfully created.
+     */
+    public static native int sl_enable_recording_from_params(int camera_id, SL_RecordingParameters recording_parameters);
 
     /**
     \brief Get the recording information.
@@ -2310,6 +2413,30 @@ public static final int
     public static native @Cast("unsigned long long") long sl_get_current_timestamp(int camera_id);
 
     /**
+    \brief Sets the clock source used for all timestamps produced by the ZED SDK.
+    @param clock : The desired \ref SL_TIMESTAMP_CLOCK.
+     */
+    public static native void sl_set_timestamp_clock(@Cast("SL_TIMESTAMP_CLOCK") int clock);
+
+    /**
+    \brief Returns the active clock source used for timestamps.
+    @return The active \ref SL_TIMESTAMP_CLOCK.
+     */
+    public static native @Cast("SL_TIMESTAMP_CLOCK") int sl_get_timestamp_clock();
+
+    /**
+    \brief Sets an upper bound on the step size of system-clock adjustments applied to SDK timestamps.
+    @param limit_ms : Maximum allowed clock step in milliseconds.
+     */
+    public static native void sl_set_max_system_clock_step_ms(float limit_ms);
+
+    /**
+    \brief Returns the current maximum system clock step limit in milliseconds.
+    @return The current limit in milliseconds.
+     */
+    public static native float sl_get_max_system_clock_step_ms();
+
+    /**
     \brief Returns the number of frames in the SVO file.
     @param camera_id : Id of the camera instance.
     @return The total number of frames in the SVO file. -1 if the SDK is not reading a SVO.
@@ -2474,7 +2601,6 @@ public static final int
     @return The number of frames dropped since the first sl_grab() call.
      */
     public static native @Cast("unsigned int") int sl_get_frame_dropped_count(int camera_id);
-
 
     /**
 	* \brief Gets the current status of the camera.
@@ -3017,14 +3143,30 @@ public static final int
     @param measure_ptr : Pointer to the measure texture.
     @param type : Measure type (depth, confidence, xyz, etc). See \ref SL_MEASURE.
     @param mem : Whether the measure should be on CPU or GPU memory. See \ref SL_MEM.
-    @param width : Width of the texture in pixel.
-    @param height : Height of the texture in pixel.
+    @param width : Width of the texture in pixel. If set to 0, the camera resolution or SL_InitParameters.maximum_working_resolution will be taken, whichever is the smallest.
+    @param height : Height of the texture in pixel. If set to 0, the camera resolution or SL_InitParameters.maximum_working_resolution will be taken, whichever is the smallest.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if the retrieve succeeded.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_INVALID_FUNCTION_PARAMETERS" if the view mode requires a module not enabled (VIEW::DEPTH with DEPTH_MODE::NONE for example).
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_INVALID_RESOLUTION" if the resolution is higher than one provided by getCameraInformation().camera_configuration.resolution.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" if another error occurred.
      */
     public static native int sl_retrieve_measure(int camera_id, Pointer measure_ptr, @Cast("SL_MEASURE") int type, @Cast("SL_MEM") int mem, int width, int height, Pointer custream);
+
+    /**
+    \brief Retrieves a voxel-decimated point cloud from the ZED SDK.
+    <p>
+    Applies spatial decimation (voxelization) to the depth map before returning the point cloud,
+    reducing point density while preserving structure. Useful for reducing data volume for downstream processing.
+    @param camera_id : Id of the camera instance.
+    @param measure_ptr : Pointer to the output Mat that will receive the voxel measure result.
+    @param type : Measure type. Must be a point-cloud type (e.g. \ref SL_MEASURE_XYZRGBA).
+    @param mem : Whether the output should be on CPU or GPU memory (\ref SL_MEM).
+    @param params : Voxelization parameters controlling voxel size and depth-adaptive mode. See \ref SL_VoxelMeasureParameters.
+    @param stream : CUDA stream to use for the computation (0 for default stream).
+    @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if the retrieve succeeded.
+     */
+    public static native int sl_retrieve_voxel_measure(int camera_id, Pointer measure_ptr, @Cast("SL_MEASURE") int type, @Cast("SL_MEM") int mem, SL_VoxelMeasureParameters params, Pointer stream);
+
     /**
     \brief Retrieves an image texture from the ZED SDK in a human-viewable format.
     
@@ -3034,8 +3176,8 @@ public static final int
     @param image_ptr : Pointer to the image texture.
     @param type : Image type (left RGB, right depth map, etc). See \ref SL_VIEW.
     @param  mem : Whether the image should be on CPU or GPU memory (\ref SL_MEM).
-    @param width : Width of the texture in pixel.
-    @param height : Height of the texture in pixel.
+    @param width : Width of the texture in pixel. If set to 0, the camera resolution or SL_InitParameters.maximum_working_resolution will be taken, whichever is the smallest.
+    @param height : Height of the texture in pixel. If set to 0, the camera resolution or SL_InitParameters.maximum_working_resolution will be taken, whichever is the smallest.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if the retrieve succeeded.
      */
     public static native int sl_retrieve_image(int camera_id, Pointer image_ptr, @Cast("SL_VIEW") int type, @Cast("SL_MEM") int mem, int width, int height, Pointer custream);
