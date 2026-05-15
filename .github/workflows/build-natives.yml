@@ -106,7 +106,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install gdown
-          gdown https://drive.google.com/uc?id=1bQ4x6fYodflO2yI6ekdKmT5HmdrF0W-j
+          gdown https://drive.google.com/uc?id=14EC5TVjwoGxp_lUAqFGycZYT9MZep2UN
           tar -xvf ZEDSDK-Windows-5.3.0.tar.gz -C "C:\\Program Files (x86)"
       - uses: ilammy/msvc-dev-cmd@v1
         with:
