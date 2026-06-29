@@ -84,4 +84,10 @@ public class SL_CameraParameters extends Pointer {
 	\brief Real focal length in millimeters.
 	 */
 	public native float focal_length_metric(); public native SL_CameraParameters focal_length_metric(float setter);
+
+	/**
+	\brief Lens distortion model of these parameters.
+	\note Raw/unrectified parameters are RAD_TAN or FISHEYE, rectified parameters are PINHOLE.
+	 */
+	public native @Cast("SL_LENS_DISTORTION_MODEL") int lens_distortion_model(); public native SL_CameraParameters lens_distortion_model(int setter);
 }

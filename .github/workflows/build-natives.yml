@@ -12,7 +12,7 @@ jobs:
   build-linux-x86_64:
     runs-on: [ubuntu-22.04]
     container:
-      image: stereolabs/zed:5.3-devel-cuda12.8-ubuntu22.04
+      image: stereolabs/zed:5.4-devel-cuda12.8-ubuntu22.04
     steps:
       - name: Install dependencies
         run: |
@@ -40,7 +40,7 @@ jobs:
   build-linux-l4t:
     runs-on: [ubuntu-22.04-arm]
     container:
-      image: stereolabs/zed:5.3-devel-l4t-r36.4
+      image: stereolabs/zed:5.4-devel-l4t-r36.4
     needs: [build-linux-x86_64]
     steps:
       - name: Install dependencies
@@ -106,8 +106,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install gdown
-          gdown https://drive.google.com/uc?id=14EC5TVjwoGxp_lUAqFGycZYT9MZep2UN
-          tar -xvf ZEDSDK-Windows-5.3.0.tar.gz -C "C:\\Program Files (x86)"
+          gdown https://drive.google.com/uc?id=1mVYZkuHn1oLnVASKXXRIhQfOF9soA3wq
+          tar -xvf ZEDSDK-Windows-5.4.0.tar.gz -C "C:\\Program Files (x86)"
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           vsversion: 2022
