@@ -113,7 +113,7 @@ public class SL_PositionalTrackingParameters extends Pointer {
 	\brief Positional tracking mode used.
 	
 	Can be used to improve accuracy in some types of scene at the cost of longer runtime.
-	\n Default: \ref SL_POSITIONAL_TRACKING_MODE_GEN_1
+	\n Default: \ref SL_POSITIONAL_TRACKING_MODE_GEN_3
 	*/
 	public native @Cast("SL_POSITIONAL_TRACKING_MODE") int mode(); public native SL_PositionalTrackingParameters mode(int setter);
 

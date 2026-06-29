@@ -62,9 +62,9 @@ public class SL_InitParameters extends Pointer {
 	\note Small resolutions offer higher framerate and lower computation time.
 	\note In most situations, \ref SL_RESOLUTION_HD720 at 60 FPS is the best balance between image quality and framerate.
 	<p>
-	Default: <ul>
-	<li>ZED X/X Mini: \ref SL_RESOLUTION_HD1200</li>
-	<li>other cameras: \ref SL_RESOLUTION_HD720</li></ul>
+	Default: \ref SL_RESOLUTION_AUTO <ul>
+	<li>Resolves to \ref SL_RESOLUTION_HD1200 for ZED X/X Mini</li>
+	<li>Resolves to \ref SL_RESOLUTION_HD720 for other cameras</li></ul>
 	\note Available resolutions are listed here: \ref SL_RESOLUTION.
 	 */
 	public native @Cast("SL_RESOLUTION") int resolution(); public native SL_InitParameters resolution(int setter);
@@ -282,7 +282,7 @@ public class SL_InitParameters extends Pointer {
 	 This will perform additional verification on the image to identify corrupted data. This verification is done in the grab function and requires some computations.
 	 If an issue is found, the grab function will output a warning as sl_ERROR_CODE_CORRUPTED_FRAME.
 	 This version doesn't detect frame tearing currently.
-	 \n default: disabled
+	 \n default: enabled
 	 */
 	public native @Cast("bool") boolean enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(boolean setter);
 
@@ -299,4 +299,13 @@ public class SL_InitParameters extends Pointer {
 	 * - maximum_working_resolution = sl::Resolution(4, 4) -> (image_width/4) x (image_height/4) = quarter size
 	 */
 	public native @ByRef SL_Resolution maximum_working_resolution(); public native SL_InitParameters maximum_working_resolution(SL_Resolution setter);
+
+	/**
+	\brief Decryption key required to open an SVO file that was recorded with encryption.
+	<p>
+	Leave empty (all zeros) if the SVO file is not encrypted.
+	\note Must match the \ref SL_RecordingParameters::encryption_key used during recording.
+	 */
+	public native @Cast("unsigned char") byte svo_decryption_key(int i); public native SL_InitParameters svo_decryption_key(int i, byte setter);
+	@MemberGetter public native @Cast("unsigned char*") BytePointer svo_decryption_key();
 }

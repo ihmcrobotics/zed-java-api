@@ -74,4 +74,21 @@ public class SL_RecordingParameters extends Pointer {
 	\note \ref compression_mode, \ref target_framerate and \ref bitrate will be ignored in this mode.
 	 */
 	public native @Cast("bool") boolean transcode_streaming_input(); public native SL_RecordingParameters transcode_streaming_input(boolean setter);
+
+	/**
+	\brief Encryption key used to protect the SVO file.
+	<p>
+	Leave empty (all zeros) to record without encryption.
+	\note The same key must be provided in \ref SL_InitParameters::svo_decryption_key for playback.
+	 */
+	public native @Cast("unsigned char") byte encryption_key(int i); public native SL_RecordingParameters encryption_key(int i, byte setter);
+	@MemberGetter public native @Cast("unsigned char*") BytePointer encryption_key();
+
+	/**
+	\brief Encoding preset for H264/H265 compression.
+	<p>
+	Controls the tradeoff between encoding speed and quality.
+	Default: \ref SL_SVO_ENCODING_PRESET_DEFAULT
+	 */
+	public native @Cast("SL_SVO_ENCODING_PRESET") int encoding_preset(); public native SL_RecordingParameters encoding_preset(int setter);
 }
