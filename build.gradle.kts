@@ -5,7 +5,7 @@ plugins {
 
 ihmc {
    group = "us.ihmc"
-   version = "5.2.0"
+   version = "5.3.0"
    vcsUrl = "https://github.com/ihmcrobotics/zed-java-api"
    openSource = true
    description = "Use Stereolabs sensors such as ZED 2, ZED 2i, ZED X, ZED Mini, ZED X Mini from Java."
