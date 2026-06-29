@@ -253,6 +253,23 @@ public static final int
 	SL_UNIT_FOOT = 4;
 
 /**
+\brief Lists the lens distortion models used to describe a camera's optics.
+\note The value is tied to the rectification state of the SL_CameraParameters it belongs to:
+raw/unrectified parameters are always RAD_TAN or FISHEYE, rectified parameters are always PINHOLE.
+Code working on raw parameters may treat "not FISHEYE" as RAD_TAN, but must not assume that on
+parameters that could be rectified.
+ */
+/** enum SL_LENS_DISTORTION_MODEL */
+public static final int
+	/** Radial-tangential (Brown-Conrady) distortion. Raw/unrectified parameters. */
+	SL_LENS_DISTORTION_MODEL_RAD_TAN = 0,
+	/** Fisheye distortion. Raw/unrectified parameters. */
+	SL_LENS_DISTORTION_MODEL_FISHEYE = 1,
+	/** Pinhole model, no distortion. Rectified parameters. */
+	SL_LENS_DISTORTION_MODEL_PINHOLE = 2,
+	SL_LENS_DISTORTION_MODEL_LAST = 3;
+
+/**
 \brief Lists available coordinates systems for positional tracking and 3D measures.
 <p>
 \image html CoordinateSystem.webp
@@ -431,6 +448,30 @@ public static final int
 	SL_STREAMING_CODEC_H265 = 1;
 
 /**
+\brief Lists the encoded video sources a Camera can expose to user code.
+A single Camera can produce up to three concurrent encoded H264/H265
+bitstreams: incoming (when opened from a network sender), outgoing
+(when \ref sl_enable_streaming() is active), and the SVO encoder output
+(when \ref sl_enable_recording() is active with a video compression mode).
+ */
+/** enum SL_ENCODED_STREAM_SOURCE */
+public static final int
+	/** Incoming stream packets (camera opened from a network sender). */
+	SL_ENCODED_STREAM_SOURCE_RECEIVING = 0,
+	/** Outgoing stream packets (\ref sl_enable_streaming() active). */
+	SL_ENCODED_STREAM_SOURCE_SENDING   = 1,
+	/** SVO encoder output (\ref sl_enable_recording() active in H264/H265 mode). */
+	SL_ENCODED_STREAM_SOURCE_RECORDING = 2;
+
+public static final int SL_ENCODED_STREAM_SOURCE_COUNT = 3;
+// Targeting ../SL_EncodedStreamPacket.java
+
+
+// Targeting ../SL_EncodedStreamInfo.java
+
+
+
+/**
 \brief Lists available camera settings for the camera (contrast, hue, saturation, gain, ...).
 \warning \ref SL_VIDEO_SETTINGS_GAIN and \ref SL_VIDEO_SETTINGS_EXPOSURE are linked in auto/default mode (see sl_set_camera_settings()).
  */
@@ -510,9 +551,11 @@ public static final int
 public static final int
 	/** Timestamps use the system (wall-clock) time. Timestamps represent nanoseconds since Unix epoch. \warning Affected by NTP/PTP adjustments. */
 	SL_TIMESTAMP_CLOCK_SYSTEM_CLOCK = 0,
-	/** Timestamps use a monotonic clock (CLOCK_MONOTONIC). Immune to system clock step adjustments. */
+	/** Timestamps use a monotonic clock (CLOCK_MONOTONIC). Never jumps on clock steps, but its rate is still slewed by NTP/PTP (stays aligned with real time, at the cost of a non-constant tick rate). */
 	SL_TIMESTAMP_CLOCK_MONOTONIC_CLOCK = 1,
-	SL_TIMESTAMP_CLOCK_LAST = 2;
+	/** Timestamps use the raw monotonic clock (CLOCK_MONOTONIC_RAW). Driven directly by hardware; immune to both NTP/PTP steps and frequency slewing, so it can slowly drift from wall-clock time. */
+	SL_TIMESTAMP_CLOCK_MONOTONIC_RAW_CLOCK = 2,
+	SL_TIMESTAMP_CLOCK_LAST = 3;
 
 /**
 \brief Controls how voxel size adapts with depth in sl_retrieve_voxel_measure.
@@ -668,7 +711,11 @@ public static final int
 	/** Normal right image in BGR pixel format: Type: \ref SL_MAT_TYPE_U8_C3 */
 	SL_VIEW_NORMALS_RIGHT_BGR = 43,
 	/** Normal right image in gray scale: Type: \ref SL_MAT_TYPE_U8_C1 */
-	SL_VIEW_NORMALS_RIGHT_GRAY = 44;
+	SL_VIEW_NORMALS_RIGHT_GRAY = 44,
+	/** Left NV12 rectified image (YUV 4:2:0 semi-planar). Type: \ref SL_MAT_TYPE_NV12 */
+	SL_VIEW_LEFT_NV12 = 45,
+	/** Right NV12 rectified image (YUV 4:2:0 semi-planar). Type: \ref SL_MAT_TYPE_NV12 */
+	SL_VIEW_RIGHT_NV12 = 46;
 
 /**
 \brief Lists the different states of object tracking.
@@ -863,7 +910,29 @@ public static final int
 	/** End to End Neural disparity estimation.\n Requires AI module. */
 	SL_DEPTH_MODE_NEURAL = 5,
 	/** More accurate Neural disparity estimation.\n Requires AI module. */
-	SL_DEPTH_MODE_NEURAL_PLUS = 6;
+	SL_DEPTH_MODE_NEURAL_PLUS = 6,
+	/** No internal depth computation. The depth (or disparity) is provided for each frame with sl_ingest_custom_depth(), between sl_read() and sl_grab(). */
+	SL_DEPTH_MODE_CUSTOM = 7;
+
+/**
+\brief Lists the content type of the map ingested with sl_ingest_custom_depth().
+ */
+/** enum SL_CUSTOM_DEPTH_FORMAT */
+public static final int
+	/** Disparity in pixels, expressed at the resolution of the provided map. Positive values = closer. Values <= 0, NaN and -Inf are treated as invalid; +Inf as too close. */
+	SL_CUSTOM_DEPTH_FORMAT_DISPARITY = 0,
+	/** Metric depth in the unit set in the init parameters. NaN, 0 and negative values are treated as invalid; +Inf as too far; -Inf as too close. */
+	SL_CUSTOM_DEPTH_FORMAT_DEPTH = 1;
+
+/**
+\brief Lists the value convention of the confidence map optionally ingested with sl_ingest_custom_depth().
+ */
+/** enum SL_CUSTOM_CONFIDENCE_CONVENTION */
+public static final int
+	/** Values in [0,1], 1 = confident (typical network output). */
+	SL_CUSTOM_CONFIDENCE_CONVENTION_PROBABILITY = 0,
+	/** SL_MEASURE_CONFIDENCE convention: values in [0,100], ~0 = reliable, 100 = unreliable. */
+	SL_CUSTOM_CONFIDENCE_CONVENTION_ZED = 1;
 
 /**
 \brief Lists possible flip modes of the camera.
@@ -3239,6 +3308,50 @@ public static final int
     public static native SL_StreamingParameters sl_get_streaming_parameters(int camera_id);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////// Encoded Stream Packet ///////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+    \brief Polls a single encoded H264/H265 packet from one of the Camera's
+    encoded sources (receiving / sending / recording).
+    <p>
+    Call after a successful \ref sl_grab(), same pattern as
+    \ref sl_retrieve_image(). The tap silently drops packets until it sees
+    the first natural IDR for the requested source, so the first packet
+    returned is always a keyframe and the byte stream from that point on is
+    self-contained (SPS/PPS ??? and VPS for HEVC ??? are inlined in front of
+    every IDR).
+    <p>
+    @param camera_id : Id of the camera instance.
+    @param source : Which encoded source to read from.
+    @param out_packet : Filled on success. \ref SL_EncodedStreamPacket::data
+            is SDK-owned and remains valid until the next call to this
+            function on the same source, or until the camera is closed.
+    @return SL_ERROR_CODE_SUCCESS on success.
+    @return SL_ERROR_CODE_INVALID_FUNCTION_CALL if the requested source is
+            not active (e.g. RECEIVING but the camera is not opened from a
+            stream, or RECORDING but the recording compression mode is
+            LOSSLESS).
+    @return SL_ERROR_CODE_FAILURE if the source is active but no new packet
+            is available yet (pre-IDR sync, dropped frame).
+    @return SL_ERROR_CODE_CAMERA_NOT_INITIALIZED if \ref sl_open_camera()
+            has not been called.
+     */
+    public static native int sl_retrieve_encoded_stream_packet(int camera_id, @Cast("SL_ENCODED_STREAM_SOURCE") int source, SL_EncodedStreamPacket out_packet);
+
+    /**
+    \brief Returns one \ref SL_EncodedStreamInfo entry per encoded source
+    (always SL_ENCODED_STREAM_SOURCE_COUNT entries, in source-enum order).
+    Use the \ref SL_EncodedStreamInfo::active flag to know which sources
+    are producing packets right now.
+    <p>
+    @param camera_id : Id of the camera instance.
+    @param out_infos : Buffer of at least SL_ENCODED_STREAM_SOURCE_COUNT entries,
+            filled in order RECEIVING, SENDING, RECORDING.
+     */
+    public static native void sl_get_encoded_streams_info(int camera_id, SL_EncodedStreamInfo out_infos);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////// Save to File Utils ////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3425,6 +3538,23 @@ public static final int
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if everything went fine, \ref SL_ERROR_CODE "SL_ERROR_CODE_FAILURE" otherwise.
    */
     public static native int sl_ingest_custom_box_objects(int camera_id, int nb_objects, SL_CustomBoxObjectData objects_in, @Cast("unsigned int") int instance_id);
+
+    /**
+    \brief Feed the depth pipeline with your own externally computed disparity or depth map (requires \ref SL_DEPTH_MODE "SL_DEPTH_MODE_CUSTOM").
+    <p>
+    The expected sequence for each frame is: sl_read(), retrieve the rectified images, compute the map externally,
+    sl_ingest_custom_depth(), then sl_grab(). The map can be provided at any resolution, in CPU or GPU memory;
+    the data is consumed during the call.
+    @param camera_id : Id of the camera instance.
+    @param map_ptr : Pointer to an SL_MAT_TYPE_F32_C1 sl::Mat holding the disparity or depth map.
+    @param format : Content type of the map. See \ref SL_CUSTOM_DEPTH_FORMAT.
+    @param scale : Multiplier applied to each map value before interpretation (sign flip, normalized output, unit mismatch). Use 1 if none.
+    @param confidence_ptr : Optional pointer to an SL_MAT_TYPE_F32_C1 sl::Mat holding the confidence map (same resolution as the map). NULL if not available.
+    @param confidence_convention : Value convention of the confidence map. See \ref SL_CUSTOM_CONFIDENCE_CONVENTION. Ignored when confidence_ptr is NULL.
+    @param timestamp_ns : Timestamp (ns) of the frame the map was computed from. 0 disables the frame-mismatch check.
+    @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if the map was ingested.
+   */
+    public static native int sl_ingest_custom_depth(int camera_id, Pointer map_ptr, @Cast("SL_CUSTOM_DEPTH_FORMAT") int format, float scale, Pointer confidence_ptr, @Cast("SL_CUSTOM_CONFIDENCE_CONVENTION") int confidence_convention, @Cast("unsigned long long") long timestamp_ns);
 
     /**
     \brief Feed the 3D Object tracking function with your own 2D bounding boxes with masks from your own detection algorithm.

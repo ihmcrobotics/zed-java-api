@@ -84,8 +84,7 @@ public class SL_RuntimeParameters extends Pointer {
 	/**
 	\brief Defines if the saturated area (luminance>=255) must be removed from depth map estimation.
 	<p>
-	Default: true
-	\note It is recommended to keep this parameter at true because saturated area can create false detection.
+	Default: false
 	 */
 	public native @Cast("bool") boolean remove_saturated_areas(); public native SL_RuntimeParameters remove_saturated_areas(boolean setter);
 }
