@@ -12,12 +12,12 @@ jobs:
   build-linux-x86_64:
     runs-on: [ubuntu-22.04]
     container:
-      image: stereolabs/zed:5.4-devel-cuda12.8-ubuntu22.04
+      image: stereolabs/zed:5.5-devel-cuda12.8-ubuntu24.04
     steps:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install git wget curl build-essential -y
+          apt-get install git wget curl build-essential unzip -y
       - uses: actions/checkout@v6
       - name: Mark workspace as safe
         run: |
@@ -40,13 +40,13 @@ jobs:
   build-linux-l4t:
     runs-on: [ubuntu-22.04-arm]
     container:
-      image: stereolabs/zed:5.4-devel-l4t-r36.4
+      image: stereolabs/zed:5.5-devel-l4t-r36.4
     needs: [build-linux-x86_64]
     steps:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install git wget curl build-essential openjdk-17-jdk -y
+          apt-get install git wget curl build-essential openjdk-17-jdk unzip libusb-1.0-0-dev -y
 # Cannot use for now, see https://github.com/actions/setup-node/issues/922
 #      - uses: actions/checkout@v4
       - name: Checkout
@@ -75,8 +75,12 @@ jobs:
           cd /work/zed-java-api
           git remote set-url origin https://${{ secrets.ROSIE_PERSONAL_ACCESS_TOKEN }}@github.com/ihmcrobotics/zed-java-api.git
           git add *.so
-          git commit -m 'Rebuild natives for Linux (arm64)'
-          git push
+          if git diff --cached --quiet; then
+            echo "No arm64 library changes to commit"
+          else
+            git commit -m 'Rebuild natives for Linux (arm64)'
+            git push
+          fi
 # Cannot use for now, see https://github.com/actions/setup-node/issues/922
 #      - name: Commit generated java and native libraries
 #        uses: EndBug/add-and-commit@v9
@@ -103,11 +107,31 @@ jobs:
         with:
           cuda: '12.8.0'
           method: 'network'
-      - name: Install dependencies
+      - name: Install ZED SDK
         run: |
-          python -m pip install gdown
-          gdown https://drive.google.com/uc?id=1mVYZkuHn1oLnVASKXXRIhQfOF9soA3wq
-          tar -xvf ZEDSDK-Windows-5.4.0.tar.gz -C "C:\\Program Files (x86)"
+          # The installer is an Inno Setup archive. Running it on a runner hangs, and most of
+          # the payload is TensorRT. Extract only the headers, import library, and CMake files.
+          curl.exe -L -o ZED_SDK.exe https://download.stereolabs.com/zedsdk/5.5.1/cu12_trt10/win
+          curl.exe -L -o innoextract.zip https://github.com/dscharrer/innoextract/releases/download/1.9/innoextract-1.9-windows.zip
+          Expand-Archive innoextract.zip -DestinationPath innoextract
+          $inno = Get-ChildItem -Recurse innoextract -Filter innoextract.exe | Select-Object -First 1
+          # -I is a prefix match. Pass both separators; the Windows build compares backslashes.
+          & $inno.FullName --extract -d zed-extract `
+            -I 'app/include' -I 'app\include' `
+            -I 'app/lib' -I 'app\lib' `
+            -I 'app/zed-config.cmake' -I 'app\zed-config.cmake' `
+            -I 'app/zed-config-version.cmake' -I 'app\zed-config-version.cmake' `
+            ZED_SDK.exe
+          if (-not (Test-Path 'zed-extract\app')) {
+            Get-ChildItem -Recurse zed-extract, app -ErrorAction SilentlyContinue | Select-Object -First 40 FullName
+            throw "innoextract did not write zed-extract\app"
+          }
+          $dest = "C:\Program Files (x86)\ZED SDK"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          Copy-Item -Recurse -Force zed-extract\app\* $dest
+          $versionFile = Join-Path $dest "zed-config-version.cmake"
+          if (-not (Test-Path $versionFile)) { throw "ZED SDK headers were not extracted to $versionFile" }
+          Get-Content $versionFile
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           vsversion: 2022
@@ -121,6 +145,7 @@ jobs:
           gradle --version
       - name: Compile native library
         run: |
+          $env:ZED_SDK_ROOT_DIR = "C:\Program Files (x86)\ZED SDK"
           bash.exe cppbuild.bash
       - name: Commit native libraries
         uses: EndBug/add-and-commit@v9

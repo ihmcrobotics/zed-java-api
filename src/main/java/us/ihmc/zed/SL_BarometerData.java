@@ -40,4 +40,6 @@ public class SL_BarometerData extends Pointer {
 	public native float pressure(); public native SL_BarometerData pressure(float setter);
 	/** \brief Relative altitude from first camera position (at \ref sl_open_camera() time).*/
 	public native float relative_altitude(); public native SL_BarometerData relative_altitude(float setter);
+	/** \brief Realtime data acquisition rate in hertz (Hz).*/
+	public native float effective_rate(); public native SL_BarometerData effective_rate(float setter);
 }

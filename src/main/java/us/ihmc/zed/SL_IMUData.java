@@ -86,4 +86,6 @@ public class SL_IMUData extends Pointer {
 	\note Not available in SVO or STREAM mode.
 	*/
 	public native @ByRef SL_Matrix3f linear_acceleration_convariance(); public native SL_IMUData linear_acceleration_convariance(SL_Matrix3f setter);
+	/** \brief Realtime data acquisition rate in hertz (Hz).*/
+	public native float effective_rate(); public native SL_IMUData effective_rate(float setter);
 }

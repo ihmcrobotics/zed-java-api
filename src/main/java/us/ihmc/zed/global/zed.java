@@ -174,7 +174,7 @@ public static final int
 	SL_ERROR_CODE_NVIDIA_DRIVER_OUT_OF_DATE = 20,
 	/** The call of the function is not valid in the current context. Could be a missing call of \ref sl_open_camera(). */
 	SL_ERROR_CODE_INVALID_FUNCTION_CALL = 21,
-	/** The ZED SDK was not able to load its dependencies or some assets are missing. Reinstall the ZED SDK or check for missing dependencies (cuDNN, TensorRT). */
+	/** The ZED SDK was not able to load its dependencies or some assets are missing. Reinstall the ZED SDK or check for missing dependencies (TensorRT). */
 	SL_ERROR_CODE_CORRUPTED_SDK_INSTALLATION = 22,
 	/** The installed ZED SDK is incompatible with the one used to compile the program. */
 	SL_ERROR_CODE_INCOMPATIBLE_SDK_VERSION = 23,
@@ -331,7 +331,9 @@ public static final int
 	/** ZED X One with 4K rolling shutter IMX678 sensor */
 	SL_MODEL_ZED_XONE_UHD = 31,
 	/** ZED X One HDR */
-	SL_MODEL_ZED_XONE_HDR = 32;
+	SL_MODEL_ZED_XONE_HDR = 32,
+	/** ZED X One Core with global shutter AR0234 sensor, direct MIPI connection */
+	SL_MODEL_ZED_XONE_CORE = 33;
 
 /**
 \brief Lists available memory type.
@@ -354,8 +356,12 @@ public static final int
 	SL_BUS_TYPE_USB = 0,
 	/** GMSL input mode \note Only on NVIDIA Jetson. */
 	SL_BUS_TYPE_GMSL = 1,
-	/** Automatically select the input type.\n Trying first for available USB cameras, then GMSL. */
-	SL_BUS_TYPE_AUTO = 2;
+	/** Automatically select the input type.\n Trying first for available USB cameras, then GMSL, then MIPI. */
+	SL_BUS_TYPE_AUTO = 2,
+	/** MIPI input mode, for a camera connected directly to a MIPI capture card. \note Only on NVIDIA Jetson. */
+	SL_BUS_TYPE_MIPI = 3,
+	/** Holoscan Camera-over-Ethernet input mode, for a camera behind a Holoscan sensor bridge. \note Only on NVIDIA Jetson. */
+	SL_BUS_TYPE_HOLOSCAN = 4;
 
 /**
 \brief Lists available sensor types.
@@ -415,7 +421,11 @@ public static final int
 	/** STREAM input mode (requires to use sl_enable_streaming() / sl_disable_streaming() on the "sender" side) */
 	SL_INPUT_TYPE_STREAM = 2,
 	/** GMSL input mode (only on NVIDIA Jetson) */
-	SL_INPUT_TYPE_GMSL = 3;
+	SL_INPUT_TYPE_GMSL = 3,
+	/** MIPI input mode, for a camera connected directly to a MIPI capture card (only on NVIDIA Jetson) */
+	SL_INPUT_TYPE_MIPI = 4,
+	/** Holoscan Camera-over-Ethernet input mode, through a Holoscan sensor bridge (only on NVIDIA Jetson) */
+	SL_INPUT_TYPE_HOLOSCAN = 5;
 
 /**
 \brief Lists possible types of position matrix used to store camera path and pose.
@@ -435,7 +445,9 @@ public static final int
 	/** The requested timestamp or data will be at the time of the frame extraction. */
 	SL_TIME_REFERENCE_IMAGE = 0,
 	/** The requested timestamp or data will be at the time of the function call. */
-	SL_TIME_REFERENCE_CURRENT = 1;
+	SL_TIME_REFERENCE_CURRENT = 1,
+	/** The middle of the frame's exposure, instead of the start of the sensor readout returned by \ref SL_TIME_REFERENCE_IMAGE.\n Use it to align frames with other sensors (LiDAR, IMU, robot joints) that are timestamped at the instant they measure.\n \note Only meaningful for \ref sl_get_timestamp(). It is rejected by \ref sl_get_sensors_data() and \ref sl_get_imu_orientation().\n \note Requires a per-frame exposure, so it is available on ZED X, ZED X Mini, ZED X One GS and ZED X One 4K. It returns 0 on every other input: USB cameras, the HDR camera family (ZED X HDR / HDR Mini / HDR Max, ZED X One HDR), and any SVO or network stream carrying no per-frame sensor metadata. Always check for 0 before using the value.\n \note On the rolling-shutter ZED X One 4K it refers to the frame's first row. */
+	SL_TIME_REFERENCE_IMAGE_CENTER_OF_EXPOSURE = 2;
 
 /**
 \brief Lists the different encoding types for image streaming.
@@ -796,6 +808,21 @@ public static final int
 	SL_POSITIONAL_TRACKING_MODE_GEN_3 = 2;
 
 /**
+\brief Lists how much GPU a module is allowed to use.
+\note The selected mode sets a floor that cannot be avoided: SL_POSITIONAL_TRACKING_MODE_GEN_1
+computes depth and therefore always uses the GPU. This preference only controls the work that is
+optional on top of that floor.
+*/
+/** enum SL_COMPUTE_PREFERENCE */
+public static final int
+	/** Default. Let the SDK choose. For positional tracking, GEN_3 runs on the CPU and GEN_1 uses the GPU, since it computes depth. */
+	SL_COMPUTE_PREFERENCE_AUTO = 0,
+	/** Use no more GPU than the selected mode requires, leaving the GPU free for your own workloads. Tracking is slower than with GPU acceleration. */
+	SL_COMPUTE_PREFERENCE_PREFER_CPU = 1,
+	/** Use GPU acceleration wherever it is available, which makes tracking faster and lowers the per-frame grab time. Falls back to the CPU by itself if the GPU cannot be used. */
+	SL_COMPUTE_PREFERENCE_PREFER_GPU = 2;
+
+/**
 \brief Report the status of the positional tracking fusion.
  */
 /** enum SL_POSITIONAL_TRACKING_FUSION_STATUS */
@@ -913,6 +940,18 @@ public static final int
 	SL_DEPTH_MODE_NEURAL_PLUS = 6,
 	/** No internal depth computation. The depth (or disparity) is provided for each frame with sl_ingest_custom_depth(), between sl_read() and sl_grab(). */
 	SL_DEPTH_MODE_CUSTOM = 7;
+
+/**
+\brief Lists the precisions available for neural depth inference.
+ */
+/** enum SL_DEPTH_PRECISION */
+public static final int
+	/** Half-precision neural depth inference (default). */
+	SL_DEPTH_PRECISION_FP16 = 0,
+	/** INT8 neural depth inference: faster and with a lower memory footprint, for a small accuracy cost.\n Only \ref SL_DEPTH_MODE_NEURAL provides an INT8 model, the other depth modes always run in FP16.\n Always safe to set: the SDK falls back to FP16, and says so in the log, when the depth mode or the GPU does not support INT8. */
+	SL_DEPTH_PRECISION_INT8 = 1,
+	/** Neither of the above.\n Only ever returned by sl_get_init_parameters(), never set by the user: the depth engine runs at a precision that has no \ref SL_DEPTH_PRECISION value. */
+	SL_DEPTH_PRECISION_LAST = 2;
 
 /**
 \brief Lists the content type of the map ingested with sl_ingest_custom_depth().
@@ -1094,7 +1133,11 @@ public static final int
 	/** For external inference, using your own custom model and/or frameworks. This mode disables the internal inference engine, the 2D bounding box detection must be provided. */
 	SL_OBJECT_DETECTION_MODEL_CUSTOM_BOX_OBJECTS = 5,
 	/** For internal inference using your own custom YOLO-like model. This mode requires a onnx file to be passed in the ObjectDetectionParameters. This model will be used for inference. */
-	SL_OBJECT_DETECTION_MODEL_CUSTOM_YOLOLIKE_BOX_OBJECTS = 6;
+	SL_OBJECT_DETECTION_MODEL_CUSTOM_YOLOLIKE_BOX_OBJECTS = 6,
+	/** For internal inference using your own custom RF-DETR / DETR-like model (two outputs: boxes + class logits, NMS-free). Requires a onnx file. */
+	SL_OBJECT_DETECTION_MODEL_CUSTOM_RFDETRLIKE_BOX_OBJECTS = 7,
+	/** For internal inference using your own custom ONNX model, auto-detecting YOLO-like vs RF-DETR/DETR-like from the model outputs. Requires a onnx file. */
+	SL_OBJECT_DETECTION_MODEL_CUSTOM_BOX_OBJECTS_AUTODETECT = 8;
 
 /**
 \brief Lists available models for the body tracking module.
@@ -1107,6 +1150,27 @@ public static final int
 	SL_BODY_TRACKING_MODEL_HUMAN_BODY_MEDIUM = 1,
 	/** Keypoints based, specific to human skeleton, state of the art accuracy, requires powerful GPU. */
 	SL_BODY_TRACKING_MODEL_HUMAN_BODY_ACCURATE = 2;
+
+/**
+\brief Lists the generations of neural network available for the body tracking module.
+<p>
+A generation is only available for some combinations of \ref SL_BODY_TRACKING_MODEL and \ref SL_BODY_FORMAT: when the requested one has no
+network for it, the ZED SDK falls back to the most recent generation it does have.
+*/
+/** enum SL_BODY_TRACKING_MODEL_GEN */
+public static final int
+	/** Use the generation the ZED SDK defaults to. Value of a zero-initialized structure, so a
+	                                             caller that does not set the field keeps following the SDK default. */
+	SL_BODY_TRACKING_MODEL_GEN_DEFAULT = 0,
+	/** Network used up to ZED SDK 5.4. Only generation available for \ref SL_BODY_FORMAT_BODY_38. */
+	SL_BODY_TRACKING_MODEL_GEN_GEN_1 = 1,
+	/** Bottom-up network introduced in ZED SDK 5.5, more robust in crowded scenes and to unusual
+	                                           poses. Available for \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_MEDIUM and
+	                                           \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_ACCURATE with \ref SL_BODY_FORMAT_BODY_18 or
+	                                           \ref SL_BODY_FORMAT_BODY_34. \ref SL_BODY_TRACKING_MODEL_HUMAN_BODY_FAST and
+	                                           \ref SL_BODY_FORMAT_BODY_38 have GEN_1 only, and fall back to it. Current
+	                                           \ref SL_BODY_TRACKING_MODEL_GEN_DEFAULT. */
+	SL_BODY_TRACKING_MODEL_GEN_GEN_2 = 2;
 
 /**
  \brief Lists available  AI models.
@@ -1143,7 +1207,9 @@ public static final int
 	SL_AI_MODELS_NEURAL_DEPTH = 13,
 	/** Related to \ref SL_DEPTH_MODE_NEURAL_PLUS*/
 	SL_AI_MODELS_NEURAL_PLUS_DEPTH = 14,
-	SL_AI_MODELS_LAST = 15;
+	/** Related to \ref SL_DEPTH_MODE_NEURAL with \ref SL_DEPTH_PRECISION_INT8. Separate artifact and engine from \ref SL_AI_MODELS_NEURAL_DEPTH.*/
+	SL_AI_MODELS_NEURAL_DEPTH_INT8 = 15,
+	SL_AI_MODELS_LAST = 16;
 
 /**
 \brief Lists supported bounding box preprocessing.
@@ -1876,6 +1942,12 @@ public static final int
 // #endif
 
 
+	/**
+	\brief Frees a buffer that the SDK allocated on the caller's behalf.
+	Use it on every pointer returned by a function whose documentation says the result belongs to
+	the caller.
+	@param ptr : The buffer to release. Passing NULL is a no-op.
+	*/
 	public static native void sl_free(Pointer ptr);
 
     /**
@@ -1919,7 +1991,7 @@ public static final int
     @param path_svo : Filename of the svo to read (for SVO input).
     @param ip : IP of the camera to open (for Stream input).
     @param stream_port : Port of the camera to open (for Stream input).
-    @param gmsl_port : GMSL port number for camera selection (only used when input_type is GMSL). Default: -1 (do nothing).
+    @param bus_port : Physical port the camera is plugged into, on whichever bus \ref input_type selects: the GMSL port or the port of the MIPI capture card. Default: -1 (do nothing).
 	@param bus_type : Whether the camera is a USB or a GMSL camera (when opening with camera ID).
     @param output_file : ZED SDK verbose log file. Redirect the SDK verbose message to the file.
     @param opt_settings_path[optional] : Settings path.
@@ -1928,9 +2000,9 @@ public static final int
     @return An error code giving information about the internal process. If \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" (0) is returned, the camera is ready to use. Every other code indicates an error and the program should be stopped.
     */
     public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  @Cast("const char*") BytePointer path_svo, @Cast("const char*") BytePointer ip, 
-            int stream_port, int gmsl_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
+            int stream_port, int bus_port, @Cast("const char*") BytePointer output_file, @Cast("const char*") BytePointer opt_settings_path, @Cast("const char*") BytePointer opencv_calib_path);
     public static native int sl_open_camera(int camera_id, SL_InitParameters init_parameters, @Cast("const unsigned int") int serial_number,  String path_svo, String ip, 
-            int stream_port, int gmsl_port, String output_file, String opt_settings_path, String opencv_calib_path);
+            int stream_port, int bus_port, String output_file, String opt_settings_path, String opencv_calib_path);
 
     /**
 	\brief Opens the ZED camera from the provided SL_InitParameters using its  camera ID.
@@ -2016,6 +2088,8 @@ public static final int
     It corresponds to the structure given as argument to the sl_open_camera() function.
     @param camera_id : Id of the camera instance.
     @return SL_InitParameters containing the parameters used to initialize the camera.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
     */
     public static native SL_InitParameters sl_get_init_parameters(int camera_id);
 
@@ -2025,6 +2099,8 @@ public static final int
     It corresponds to the structure given as argument to the sl_grab() function.
     @param camera_id : id of the camera instance.
     @return SL_RuntimeParameters containing the parameters that define the behavior of the \ref sl_grab function.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
     */
     public static native SL_RuntimeParameters sl_get_runtime_parameters(int camera_id);
 
@@ -2034,6 +2110,8 @@ public static final int
     It corresponds to the structure given as argument to the \ref sl_enable_positional_tracking() method.
     @param camera_id : Id of the camera instance.
     @return \ref SL_PositionalTrackingParameters containing the parameters used for positional tracking initialization.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
     */
     public static native SL_PositionalTrackingParameters sl_get_positional_tracking_parameters(int camera_id);
 
@@ -2181,6 +2259,8 @@ public static final int
     /**
     \brief Get the recording information.
     @return The recording state structure. For more details, see \ref SL_RecordingStatus.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_RecordingStatus sl_get_recording_status(int camera_id);
     /**
@@ -2195,6 +2275,8 @@ public static final int
     It corresponds to the structure given as argument to the \ref sl_enable_recording() function.
     @param camera_id : Id of the camera instance.
     @return \ref SL_RecordingParameters containing the parameters used for recording initialization.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_RecordingParameters sl_get_recording_parameters(int camera_id);
 
@@ -2389,6 +2471,8 @@ public static final int
     @param res_width : You can specify a size different from default image size to get the scaled camera information.
     @param res_height : You can specify a size different from default image size to get the scaled camera information.
     @return SL_CameraInformation containing the calibration parameters of the ZED, as well as serial number and firmware version.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_CameraInformation sl_get_camera_information(int camera_id, int res_width, int res_height);
 
@@ -2405,6 +2489,8 @@ public static final int
     @param camera_id : id of the camera instance.
     @param r_params : if true, returns Intrinsic and Extrinsic stereo parameters for original images (unrectified/distorded), else returns parameters for rectified/undistorded images.
     @return Structure containing Intrinsic and Extrinsic stereo parameters
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_CalibrationParameters sl_get_calibration_parameters(int camera_id, @Cast("bool") boolean raw_params);
 
@@ -2412,6 +2498,8 @@ public static final int
     \brief Gets the Sensors configuration.
     @param camera_id : id of the camera instance.
     @return Structure containing information about all the sensors available in the current device.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_SensorsConfiguration sl_get_sensors_configuration(int camera_id);
 
@@ -2480,6 +2568,17 @@ public static final int
     @return The current timestamp.
      */
     public static native @Cast("unsigned long long") long sl_get_current_timestamp(int camera_id);
+
+    /**
+    \brief Get a timestamp at the given time reference.
+    <p>
+    \note It should be called after a sl_grab() when using \ref SL_TIME_REFERENCE_IMAGE or
+    \ref SL_TIME_REFERENCE_IMAGE_CENTER_OF_EXPOSURE.
+    @param camera_id : Id of the camera instance.
+    @param time_reference : The desired \ref SL_TIME_REFERENCE.
+    @return The timestamp, or 0 if the requested reference is not available on this input.
+     */
+    public static native @Cast("unsigned long long") long sl_get_timestamp(int camera_id, @Cast("SL_TIME_REFERENCE") int time_reference);
 
     /**
     \brief Sets the clock source used for all timestamps produced by the ZED SDK.
@@ -2554,6 +2653,9 @@ public static final int
     @param reset : Cancel the manual ROI and reset it to the full image.
     @return \ref SL_ERROR_CODE to indicate if the function was successful.
     \note The function works only if the camera is open in LIVE or STREAM mode.
+    \note A ROI larger than the image, or smaller than the minimum size the camera accepts, is rejected and the previously set ROI stays in use.
+    Check this function's return code to know whether the ROI was applied: sl_get_roi_for_aec_agc() reports the still-active ROI with
+    \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" and so cannot confirm it.
      */
     public static native @Cast("SL_ERROR_CODE") int sl_set_roi_for_aec_agc(int camera_id, @Cast("SL_SIDE") int side, SL_Rect roi, @Cast("bool") boolean reset);
 
@@ -2588,9 +2690,11 @@ public static final int
     @param camera_id : Id of the camera instance.
     @param side : \ref SL_SIDE on which to get the ROI from.
     @param roi [Out] : Region of interest.
-    @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if ROI has been applied. Other \ref SL_ERROR_CODE otherwise.
+    @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if the ROI could be read. Other \ref SL_ERROR_CODE otherwise.
     \note The function works only if the camera is open in LIVE or STREAM mode.
     \note Settings are not exported in the SVO file format.
+    \note The ROI reported is the one currently used by AEC/AGC, which is the last one accepted, not necessarily the last one requested.
+    A rejected sl_set_roi_for_aec_agc() leaves the previous ROI in use, and this function then returns that ROI with \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS".
      */
     public static native @Cast("SL_ERROR_CODE") int sl_get_roi_for_aec_agc(int id, @Cast("SL_SIDE") int side, SL_Rect roi);
 
@@ -2628,6 +2732,7 @@ public static final int
     /**
     \brief Returns the version of the currently installed ZED SDK.
     @return The ZED SDK version installed.
+    \note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
      */
     public static native @Cast("char*") BytePointer sl_get_sdk_version();
 
@@ -2660,7 +2765,10 @@ public static final int
     *  @param camera_id : Id of the camera instance.
     * @param timestamp The target timestamp for which the frame index is to be determined.
     * @return The frame index within the SVO file that aligns with the given timestamp.
-    *         Returns -1 if the timestamp falls outside the bounds of the SVO file.
+    *         When no frame carries the timestamp exactly, the closest frame at or before it
+    *         is returned, never the frame after it. A timestamp outside the range the SVO
+    *         covers gives its first or its last frame rather than an error. Returns -1 only
+    *         when the input is not an SVO file or none of its frames can be read.
     */
     public static native int sl_get_svo_position_at_timestamp(int camera_id, @Cast("unsigned long long") long timestamp);
 
@@ -2675,11 +2783,29 @@ public static final int
 	* \brief Gets the current status of the camera.
 	* @param camera_id : Id of the camera instance.
 	* @return HealthStatus Structure containing the self diagnostic results of the image/depth/sensors
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
     */
 	public static native SL_HealthStatus sl_get_health_status(int camera_id);
 
+    /**
+    \brief Returns the resolution at which sl_retrieve_image() outputs, for a requested resolution.
+    @param camera_id : Id of the camera instance.
+    @param res : The requested resolution. Pass 0x0 for the default.
+    @return The resolution actually used.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
+    */
     public static native SL_Resolution sl_get_retrieve_image_resolution(int camera_id, SL_Resolution res);
 
+    /**
+    \brief Returns the resolution at which sl_retrieve_measure() outputs, for a requested resolution.
+    @param camera_id : Id of the camera instance.
+    @param res : The requested resolution. Pass 0x0 for the default.
+    @return The resolution actually used.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
+    */
     public static native SL_Resolution sl_get_retrieve_measure_resolution(int camera_id, SL_Resolution res);
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////// Motion tracking ///////////////////////////////////////////////////////////////////////
@@ -2758,6 +2884,8 @@ public static final int
     /**
      \brief Return the current status of positional tracking module.
      @return SL_POSITIONAL_TRACKING_STATUS current status of positional tracking module.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_PositionalTrackingStatus sl_get_positional_tracking_status(int camera_id);
 
@@ -2831,8 +2959,11 @@ public static final int
     public static native int sl_get_sensors_data_batch_count(int camera_id, int[] count);
     /**
     \brief Retrieves all SL_SensorsData associated to most recent grabbed frame in the specified \ref COORDINATE_SYSTEM of InitParameters.
-	\note sl_get_sensors_data_batch needs to be called before this function to retrieve the size of the imu batch array.
-    @param data [out] : The SensorsData array to store the data.
+	\note sl_get_sensors_data_batch_count() must be called first: it fills the batch and reports how
+	many elements this call will return.
+    @param data [out] : Receives a newly allocated array of that many SL_SensorsData.
+	\note The array belongs to the caller: release it with \ref sl_free(). It is set to NULL
+	when the batch is empty.
     @param camera_id : Id of the camera instance.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SUCCESS" if sensors data have been extracted.
     @return \ref SL_ERROR_CODE "SL_ERROR_CODE_SENSORS_NOT_AVAILABLE" if the camera model is a \ref SL_MODEL "SL_MODEL_ZED".
@@ -2886,6 +3017,8 @@ public static final int
     It corresponds to the structure given as argument to the \ref sl_enable_spatial_mapping() method.
     @param camera_id : Id of the camera instance.
     @return \ref SL_SpatialMappingParameters containing the parameters used for spatial mapping initialization.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_SpatialMappingParameters sl_get_spatial_mapping_parameters(int camera_id);
     /**
@@ -3304,6 +3437,8 @@ public static final int
     
     It corresponds to the structure given as argument to the \ref sl_enable_streaming() function.
     @return \ref SL_StreamingParameters containing the parameters used for streaming initialization.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_StreamingParameters sl_get_streaming_parameters(int camera_id);
 
@@ -3319,7 +3454,7 @@ public static final int
     \ref sl_retrieve_image(). The tap silently drops packets until it sees
     the first natural IDR for the requested source, so the first packet
     returned is always a keyframe and the byte stream from that point on is
-    self-contained (SPS/PPS ??? and VPS for HEVC ??? are inlined in front of
+    self-contained (SPS/PPS, and VPS for HEVC, are inlined in front of
     every IDR).
     <p>
     @param camera_id : Id of the camera instance.
@@ -3396,6 +3531,8 @@ public static final int
         @param model : AI model to check.
         @param gpu_id : ID of the gpu.
         @return The status of the given model for the specified GPU.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
     */
     public static native SL_AI_Model_status sl_check_AI_model_status(@Cast("SL_AI_MODELS") int model, int gpu_id);
 
@@ -3406,6 +3543,22 @@ public static final int
     @return SUCCESS if the model is well optimized.
     */
     public static native int sl_optimize_AI_model(@Cast("SL_AI_MODELS") int model, int gpu_id);
+
+    /**
+    \brief Optimize a custom object detection ONNX model ahead of time, so that \ref sl_enable_object_detection() can start using it right away.
+    <p>
+    This optimizes the given ONNX file exactly as \ref sl_enable_object_detection() does when SL_ObjectDetectionParameters.detection_model is set to
+    SL_OBJECT_DETECTION_MODEL_CUSTOM_YOLOLIKE_BOX_OBJECTS, SL_OBJECT_DETECTION_MODEL_CUSTOM_RFDETRLIKE_BOX_OBJECTS or
+    SL_OBJECT_DETECTION_MODEL_CUSTOM_BOX_OBJECTS_AUTODETECT, and saves the result for re-use. Optimizing a model can take several minutes, so this is
+    meant to be called once when installing or deploying your application, rather than on its critical path.
+    @param custom_onnx_file : Path to the ONNX file to optimize. Use the same value as SL_ObjectDetectionParameters.custom_onnx_file.
+    @param custom_onnx_dynamic_input_shape : Input resolution to optimize the model for. Use the same value as SL_ObjectDetectionParameters.custom_onnx_dynamic_input_shape, otherwise the optimized model cannot be re-used and the model is optimized again at runtime.
+    @param gpu_id : ID of the gpu on which the model will run. The optimized model is specific to it.
+    @return SUCCESS if the model is optimized and ready to be used, INVALID_FUNCTION_PARAMETERS if no ONNX file was given or if it cannot be found.
+    \note A model with a fixed input resolution keeps its own: \a custom_onnx_dynamic_input_shape is then only used to identify the optimized model.
+    */
+    public static native int sl_optimize_custom_AI_model(@Cast("const char*") BytePointer custom_onnx_file, @ByVal SL_Resolution custom_onnx_dynamic_input_shape, int gpu_id);
+    public static native int sl_optimize_custom_AI_model(String custom_onnx_file, @ByVal SL_Resolution custom_onnx_dynamic_input_shape, int gpu_id);
 
     /**
     \brief Initializes and starts object detection module.
@@ -3436,6 +3589,8 @@ public static final int
     It corresponds to the structure given as argument to the \ref sl_enable_object_detection() function.
     @param camera_id : Id of the camera instance.
     @return \ref SL_ObjectDetectionParameters containing the parameters used for object detection initialization.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_ObjectDetectionParameters sl_get_object_detection_parameters(int camera_id);
 
@@ -3492,6 +3647,8 @@ public static final int
     It corresponds to the structure given as argument to the \ref sl_enable_body_tracking() function.
     @param camera_id : Id of the camera instance.
     @return \ref SL_BodyTrackingParameters containing the parameters used for body tracking initialization.
+	\note The returned buffer belongs to the caller: release it with \ref sl_free() when done.
+	Not doing so leaks it.
      */
     public static native SL_BodyTrackingParameters sl_get_body_tracking_parameters(int camera_id);
 
@@ -4231,7 +4388,7 @@ public static final int
     /**
     \brief Reads an image from a file.
     
-    Supports .png and .jpeg. Only works if matrix has access to \ref SL_MEM_CPU.
+    Supports .png, .jpeg and .exr (OpenEXR, for float data). Only works if matrix has access to \ref SL_MEM_CPU.
     @param ptr : Pointer of the matrix.
     @param file_path : Path of the file to read from (including the name and extension).
     @return \ref SL_ERROR_CODE_SUCCESS if everything went well, \ref SL_ERROR_CODE_FAILURE otherwise.
@@ -4240,12 +4397,18 @@ public static final int
     public static native int sl_mat_read(Pointer ptr, String file_path);
     /**
     \brief Writes the Mat into a file as an image. Only works if Mat has access to MEM_CPU.
+    <p>
+    Supports .png and .jpeg for 8-bit images, and .exr (OpenEXR) for float images, which keeps every
+    value exactly as it is, NaN and infinity included. OpenEXR is a floating-point format: an .exr
+    path with an 8- or 16-bit image returns \ref SL_ERROR_CODE_FAILURE.
     @param ptr : Pointer of the matrix.
     @param file_path : Path of the file to write (including the name and extension).
+    @param compression_level : Compression level, in [0, 100]. A higher value means a smaller file. Pass -1 for
+    the format default. Ignored for .exr, which is lossless.
     @return \ref SL_ERROR_CODE_SUCCESS if everything went well, \ref SL_ERROR_CODE_FAILURE otherwise.
      */
-    public static native int sl_mat_write(Pointer ptr, @Cast("const char*") BytePointer file_path);
-    public static native int sl_mat_write(Pointer ptr, String file_path);
+    public static native int sl_mat_write(Pointer ptr, @Cast("const char*") BytePointer file_path, int compression_level);
+    public static native int sl_mat_write(Pointer ptr, String file_path, int compression_level);
     /**
     \brief Returns the width of the matrix.
     @param ptr : Pointer of the matrix.

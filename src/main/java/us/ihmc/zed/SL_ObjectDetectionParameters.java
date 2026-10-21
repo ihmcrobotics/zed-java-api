@@ -79,9 +79,8 @@ public class SL_ObjectDetectionParameters extends Pointer {
 	The resulting optimized model will be saved for re-use in the future.
 	<p>
 	\attention - The model must be a YOLO-like model.
-	\attention - The caching uses the {@code custom_onnx_file} string along with your GPU specs to decide whether to use the cached optmized model or to optimize the passed onnx model.
-		If you want to use a different model (i.e. an onnx with different weights), you must use a different {@code custom_onnx_file} string or delete the cached optimized model in
-		<ZED Installation path>/resources.
+	\attention - The caching uses the content of {@code custom_onnx_file} along with your GPU specs to decide whether to use the cached optimized model or to optimize
+		the passed onnx model. If you change the weights of the onnx file and pass the same path, the ZED SDK will detect the difference and optimize the new model.
 	<p>
 	\note This parameter is useless when detection_model is not \ref OBJECT_DETECTION_MODEL::CUSTOM_YOLOLIKE_BOX_OBJECTS.
 	*/

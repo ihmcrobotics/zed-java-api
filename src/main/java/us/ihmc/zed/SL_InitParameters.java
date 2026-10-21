@@ -282,9 +282,11 @@ public class SL_InitParameters extends Pointer {
 	 This will perform additional verification on the image to identify corrupted data. This verification is done in the grab function and requires some computations.
 	 If an issue is found, the grab function will output a warning as sl_ERROR_CODE_CORRUPTED_FRAME.
 	 This version doesn't detect frame tearing currently.
-	 \n default: enabled
+	 \n Higher values run more checks: 2 and above compare the left and right images, above 2 adds blur
+	 detection and above 3 adds edge comparison. Each level costs more computation than the previous one.
+	 \n default: 1 (enabled)
 	 */
-	public native @Cast("bool") boolean enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(boolean setter);
+	public native int enable_image_validity_check(); public native SL_InitParameters enable_image_validity_check(int setter);
 
 	/**
 	\brief Set a maximum size for all SDK output, like retrieveImage and retrieveMeasure functions.
@@ -308,4 +310,24 @@ public class SL_InitParameters extends Pointer {
 	 */
 	public native @Cast("unsigned char") byte svo_decryption_key(int i); public native SL_InitParameters svo_decryption_key(int i, byte setter);
 	@MemberGetter public native @Cast("unsigned char*") BytePointer svo_decryption_key();
+
+	/**
+	\brief \ref SL_DEPTH_PRECISION used for neural depth inference.
+	<p>
+	Default: \ref SL_DEPTH_PRECISION_FP16
+	\n Set it to \ref SL_DEPTH_PRECISION_INT8 to request INT8 inference, which is faster and uses less memory for a small accuracy cost. Only \ref SL_DEPTH_MODE_NEURAL provides an INT8 model, the other depth modes always run in FP16.
+	\n Always safe to set: the SDK falls back to FP16, and says so in the log, when the depth mode or the GPU does not support INT8. sl_get_init_parameters() reports the precision actually in use, which may differ from the one requested here.
+	 */
+	public native @Cast("SL_DEPTH_PRECISION") int depth_precision(); public native SL_InitParameters depth_precision(int setter);
+
+	/**
+	\brief Allows the ZED SDK to use a CUDA Graph to run the depth computation.
+	<p>
+	When enabled, the depth computation is recorded once and replayed on every sl_grab() call, which lowers the CPU cost of launching it and shortens the depth runtime itself. The depth output is unchanged. The gain is most visible on embedded platforms, where the launch overhead is a larger share of the frame time.
+	\n It is disabled by default because it is a trade-off, not a free gain. Replaying the whole computation as a single unit gives the ZED SDK a larger share of the GPU, so anything else running on the same GPU, your own code included, tends to get slower. Depth gets faster, the rest of the board often does not. Enable it when depth is what matters most on that GPU, and measure your whole application rather than the depth runtime alone.
+	\n This is a permission, not a guarantee: it only applies to the \ref SL_DEPTH_MODE NEURAL family, and if the recording cannot be performed the ZED SDK reverts to the regular computation for the rest of the session. sl_grab() keeps working either way.
+	<p>
+	Default: false (disabled)
+	 */
+	public native @Cast("bool") boolean allow_depth_cuda_graph(); public native SL_InitParameters allow_depth_cuda_graph(boolean setter);
 }

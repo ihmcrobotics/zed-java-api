@@ -74,4 +74,10 @@ public class SL_HealthStatus extends Pointer {
 	 * timestamp inconsistency, resonance frequencies, saturated sensors / very high acceleration or rotation, shocks
 	 */
 	public native @Cast("bool") boolean low_motion_sensors_reliability(); public native SL_HealthStatus low_motion_sensors_reliability(boolean setter);
+
+	/**
+	\brief This status indicates if current image is a duplicated image
+	 * This indicates the image may be duplicated, so not a new one even if the timestamp say so.
+	 */
+	public native @Cast("bool") boolean duplicated_image(); public native SL_HealthStatus duplicated_image(boolean setter);
 }
