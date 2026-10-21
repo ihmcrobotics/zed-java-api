@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install git wget curl build-essential -y
+          apt-get install git wget curl build-essential unzip -y
       - uses: actions/checkout@v6
       - name: Mark workspace as safe
         run: |
@@ -46,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install git wget curl build-essential openjdk-17-jdk -y
+          apt-get install git wget curl build-essential openjdk-17-jdk unzip libusb-1.0-dev -y
 # Cannot use for now, see https://github.com/actions/setup-node/issues/922
 #      - uses: actions/checkout@v4
       - name: Checkout
