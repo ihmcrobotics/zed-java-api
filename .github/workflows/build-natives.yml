@@ -75,8 +75,12 @@ jobs:
           cd /work/zed-java-api
           git remote set-url origin https://${{ secrets.ROSIE_PERSONAL_ACCESS_TOKEN }}@github.com/ihmcrobotics/zed-java-api.git
           git add *.so
-          git commit -m 'Rebuild natives for Linux (arm64)'
-          git push
+          if git diff --cached --quiet; then
+            echo "No arm64 library changes to commit"
+          else
+            git commit -m 'Rebuild natives for Linux (arm64)'
+            git push
+          fi
 # Cannot use for now, see https://github.com/actions/setup-node/issues/922
 #      - name: Commit generated java and native libraries
 #        uses: EndBug/add-and-commit@v9
@@ -105,11 +109,18 @@ jobs:
           method: 'network'
       - name: Install ZED SDK
         run: |
+          # The installer is an Inno Setup archive. Running it on a runner hangs, and most of
+          # the payload is TensorRT. Extract only the headers, import library, and CMake files.
           curl.exe -L -o ZED_SDK.exe https://download.stereolabs.com/zedsdk/5.5.1/cu12_trt10/win
-          $install = Start-Process -FilePath ".\ZED_SDK.exe" -ArgumentList "/VERYSILENT","/NORESTART","/SUPPRESSMSGBOXES","/NOCANCEL" -Wait -PassThru
-          if ($install.ExitCode -ne 0) { throw "ZED SDK installer exited with code $($install.ExitCode)" }
-          $versionFile = "C:\Program Files (x86)\ZED SDK\zed-config-version.cmake"
-          if (-not (Test-Path $versionFile)) { throw "ZED SDK was not installed to $versionFile" }
+          curl.exe -L -o innoextract.zip https://github.com/dscharrer/innoextract/releases/download/1.9/innoextract-1.9-windows.zip
+          Expand-Archive innoextract.zip -DestinationPath innoextract
+          $inno = Get-ChildItem -Recurse innoextract -Filter innoextract.exe | Select-Object -First 1
+          & $inno.FullName --extract --include=app/include --include=app/lib --include=app/zed-config.cmake --include=app/zed-config-version.cmake --output-dir zed-extract ZED_SDK.exe
+          $dest = "C:\Program Files (x86)\ZED SDK"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          Copy-Item -Recurse -Force zed-extract\app\* $dest
+          $versionFile = Join-Path $dest "zed-config-version.cmake"
+          if (-not (Test-Path $versionFile)) { throw "ZED SDK headers were not extracted to $versionFile" }
           Get-Content $versionFile
       - uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -124,6 +135,7 @@ jobs:
           gradle --version
       - name: Compile native library
         run: |
+          $env:ZED_SDK_ROOT_DIR = "C:\Program Files (x86)\ZED SDK"
           bash.exe cppbuild.bash
       - name: Commit native libraries
         uses: EndBug/add-and-commit@v9
