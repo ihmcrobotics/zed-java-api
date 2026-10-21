@@ -88,6 +88,9 @@ public class SL_BodyData extends Pointer {
 	\brief Mask defining which pixels which belong to the body/person (in \ref bounding_box_2d and set to 255) and those of the background (set to 0).
 	\warning The mask information is only available for tracked bodies (\ref SL_OBJECT_TRACKING_STATE_OK) that have a valid depth.
 	\warning Otherwise, the mask will not be initialized.
+	\note This is an sl::Mat handle allocated for you on every retrieve. It belongs to the caller:
+	release it with \ref sl_mat_free() once the frame is consumed, otherwise it leaks per detection
+	per frame.
 	*/
 	public native IntPointer mask(); public native SL_BodyData mask(IntPointer setter);
 	//int* mask; //IntPtr to an sl::Mat object.

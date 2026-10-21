@@ -126,4 +126,10 @@ public class SL_PositionalTrackingParameters extends Pointer {
 	 * \brief Whether to enable the 2D ground mode.
 	 */
 	public native @Cast("bool") boolean enable_2d_ground_mode(); public native SL_PositionalTrackingParameters enable_2d_ground_mode(boolean setter);
+
+	/**
+	 * \brief How much GPU positional tracking is allowed to use.
+	 * \n default : SL_COMPUTE_PREFERENCE_AUTO
+	 */
+	public native @Cast("SL_COMPUTE_PREFERENCE") int compute_preference(); public native SL_PositionalTrackingParameters compute_preference(int setter);
 }

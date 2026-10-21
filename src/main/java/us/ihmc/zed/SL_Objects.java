@@ -66,4 +66,10 @@ public class SL_Objects extends Pointer {
 	 */
 	public native @ByRef SL_ObjectData object_list(int i); public native SL_Objects object_list(int i, SL_ObjectData setter);
 	@MemberGetter public native SL_ObjectData object_list();
+	/**
+	\brief Name of the group these objects belong to when fused, as set in \ref SL_ObjectDetectionParameters.
+	\note Empty when the detector was not given a group name. Truncated to 127 characters.
+	 */
+	public native @Cast("char") byte fused_objects_group_name(int i); public native SL_Objects fused_objects_group_name(int i, byte setter);
+	@MemberGetter public native @Cast("char*") BytePointer fused_objects_group_name();
 }

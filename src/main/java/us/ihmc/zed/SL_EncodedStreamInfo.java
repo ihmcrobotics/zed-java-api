@@ -14,7 +14,7 @@ import static us.ihmc.zed.global.zed.*;
 /**
 \brief Describes one encoded video source exposed by the Camera.
 <p>
-Returned by \ref sl_get_encoded_streams_info() ??? one entry per source,
+Returned by \ref sl_get_encoded_streams_info(): one entry per source,
 whether currently active or not. Use this to discover which sources are
 producing data and at what codec/bitrate before calling
 \ref sl_retrieve_encoded_stream_packet().

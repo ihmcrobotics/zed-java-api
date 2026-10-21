@@ -62,4 +62,13 @@ public class SL_RecordingStatus extends Pointer {
      \brief Average compression ratio (% of raw size) since beginning of recording.
 	 */
 	public native double average_compression_ratio(); public native SL_RecordingStatus average_compression_ratio(double setter);
+	/**
+	 \brief Number of frames handed to the recorder since the beginning of the recording.
+	 */
+	public native int number_frames_ingested(); public native SL_RecordingStatus number_frames_ingested(int setter);
+	/**
+	 \brief Number of frames actually written to the file since the beginning of the recording.
+	 \note A value below \ref number_frames_ingested means frames were dropped because the encoder could not keep up.
+	 */
+	public native int number_frames_encoded(); public native SL_RecordingStatus number_frames_encoded(int setter);
 }
