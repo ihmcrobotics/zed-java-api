@@ -115,7 +115,17 @@ jobs:
           curl.exe -L -o innoextract.zip https://github.com/dscharrer/innoextract/releases/download/1.9/innoextract-1.9-windows.zip
           Expand-Archive innoextract.zip -DestinationPath innoextract
           $inno = Get-ChildItem -Recurse innoextract -Filter innoextract.exe | Select-Object -First 1
-          & $inno.FullName --extract --include=app/include --include=app/lib --include=app/zed-config.cmake --include=app/zed-config-version.cmake --output-dir zed-extract ZED_SDK.exe
+          # -I is a prefix match. Pass both separators; the Windows build compares backslashes.
+          & $inno.FullName --extract -d zed-extract `
+            -I 'app/include' -I 'app\include' `
+            -I 'app/lib' -I 'app\lib' `
+            -I 'app/zed-config.cmake' -I 'app\zed-config.cmake' `
+            -I 'app/zed-config-version.cmake' -I 'app\zed-config-version.cmake' `
+            ZED_SDK.exe
+          if (-not (Test-Path 'zed-extract\app')) {
+            Get-ChildItem -Recurse zed-extract, app -ErrorAction SilentlyContinue | Select-Object -First 40 FullName
+            throw "innoextract did not write zed-extract\app"
+          }
           $dest = "C:\Program Files (x86)\ZED SDK"
           New-Item -ItemType Directory -Force -Path $dest | Out-Null
           Copy-Item -Recurse -Force zed-extract\app\* $dest
